@@ -90,9 +90,9 @@ def webhook():
 		for i in range(len(data['text'])): #Scan for keywords.
 			if data['text'][i:i+4].lower() == 'luke': #luke!
 				post_message('Luke! Luke! Luke!', '')
-			if data['joke'][i:i+4].lower() == 'joke': #laughs
+			if data['text'][i:i+4].lower() == 'joke': #laughs
 				read_joke()
-			if data['quote'][i:i+5].lower() == 'quote': #motivation
+			if data['text'][i:i+5].lower() == 'quote': #motivation
 				read_quote()
 	return "ok", 200
 

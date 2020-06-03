@@ -82,7 +82,8 @@ def log(msg): #Printing log information.
 
 #~~~~~~~~~~~~~~~ Endpoint for GroupMe messages.
 @app.route('/', methods=['POST'])
-def webhook():
+def webhook()
+	global message_count
 	data = request.get_json()
 	if data['name'] != 'The Talker' and data['name'] != 'The Assistant':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))

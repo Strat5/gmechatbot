@@ -16,7 +16,7 @@ Heroku offers free 24/7 hosting, but with limited computer hours, so certain tim
 Flask is imported in the code to handle HTTP POST requests.
 The files in this GitHub directory are uploaded to Heroku automatically.
 
-EXPLANTATION OF THE NON-APPLICATION FILES:
+EXPLANTATION OF THE APPLICATION FILES:
 
 Procfile - This tells Heroku what basic service to run.
 

@@ -194,6 +194,7 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 			'accept-language' : 'en'
 		}
 	)
+	verse = data.json()['verse']['text'] + '\n-' + data.json()['verse']['human_reference'] 
 	log('The Digital Journalist Log: Recieved VOTD. {}'.format(data))
 
 
@@ -212,3 +213,4 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 	msg = '', #Post the image to the chat.
 	image_url = (data.json()['payload']['url'])
 	post_message('The Digital Journalist', msg, image_url)
+	post_message('The Digital Journalist', verse, '')

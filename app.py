@@ -10,10 +10,10 @@ import datetime
 import wget
 import time
 app = Flask(__name__)
+message_count = 0
 
 #~~~~~~~~~~~~~~~ General-use methods.
 def post_message(bot_name, msg, image_url): #Sending a message to the group chat.
-
 	if image_url == '': #Post message without photo.
 		if bot_name == 'The Talker': #Post message from Talker.
 			data = requests.post(
@@ -87,13 +87,20 @@ def webhook():
 	if data['name'] != 'The Talker' and data['name'] != 'The Assistant':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 
+		if data['text'][0] == '?': 
+				post_message('The Talker', '?', '')
 		for i in range(len(data['text'])): #Scan for keywords.
-			if data['text'][i:i+4].lower() == 'luke': #luke!
-				post_message('Luke! Luke! Luke!', '')
 			if data['text'][i:i+4].lower() == 'joke': #laughs
 				read_joke()
 			if data['text'][i:i+5].lower() == 'quote': #motivation
 				read_quote()
+			if data['text'][i:i+4].lower() == 'The Talker': #laughs
+				post_message('Hehehe', '?', '')
+
+		message_count += 1 #Tracking messages sent.
+		if message_count > 9:
+			post_message('The Talker', "My oh my! We've already reached 10 messages! Since my last update, that is.", '')
+
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
@@ -181,8 +188,8 @@ def read_history(): #Recalling the events of the past.
 			x = story3
 			story3 = story2
 			story2 = x
-
-	post_message('The Digital Journalist', 'Today in History, {}: \n\n{}, {}\n\n{}, {}\n\n{}, {}'.format(data.json()['date'], data.json()['data']['Events'][story1]['year'], data.json()['data']['Events'][story1]['text'], data.json()['data']['Events'][story2]['year'], data.json()['data']['Events'][story2]['text'], data.json()['data']['Events'][story3]['year'], data.json()['data']['Events'][story3]['text']), '')
+	date = data.json()['date']
+	post_message('The Digital Journalist', 'Today in History, {}: \n\n{}, {}\n\n{}, {}\n\n{}, {}'.format(date, data.json()['data']['Events'][story1]['year'], data.json()['data']['Events'][story1]['text'], data.json()['data']['Events'][story2]['year'], data.json()['data']['Events'][story2]['text'], data.json()['data']['Events'][story3]['year'], data.json()['data']['Events'][story3]['text']), '')
 
 def read_votd(): #Downloading and uploading verse of tbe day picture.
 	dayNumber = (datetime.date.today() - datetime.date(2020, 1, 1)).days

@@ -9,73 +9,9 @@ import linecache
 import datetime
 import wget
 import time
+from spac.lang.en import English
 app = Flask(__name__)
-message_count = 0
-
-#~~~~~~~~~~~~~~~ General-use methods.
-def post_message(bot_name, msg, image_url): #Sending a message to the group chat.
-	if image_url == '': #Post message without photo.
-		if bot_name == 'The Talker': #Post message from Talker.
-			data = requests.post(
-				url = 'https://api.groupme.com/v3/bots/post', 
-				data = {
-					'bot_id'  : os.getenv('TALKER_BOT_ID'),
-					'text' : msg,
-				}
-			)
-			log('The Talker Log: Message: "{}" was posted. {}'.format(msg, data))
-		elif bot_name == 'The Digital Journalist': #Post message from The Digital Journalist.
-			data = requests.post(
-				url = 'https://api.groupme.com/v3/bots/post', 
-				data = {
-					'bot_id'  : os.getenv('JOURNALIST_BOT_ID'),
-					'text' : msg,
-				}
-			)
-			log('The Digital Journalist Log: Message: "{}" was posted. {}'.format(msg, data))
-	else: #Post message with photo.
-		if bot_name == 'The Talker': #Post message from The Talker.
-			data = requests.post(
-				url = 'https://api.groupme.com/v3/bots/post', 
-				params = {
-					'bot_id'  : os.getenv('Talker_BOT_ID'),
-					'text' : msg,
-					'attachments' : [
-   						{
-							'type' : 'image',
-							'url'  : image_url
-						}
-					]
-				},
-				data = {
-					'text' : 'Image',
-					'picture_url' : image_url
-				}
-			)
-			log('The Talker Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
-		elif bot_name == 'The Digital Journalist': #Post message from The Digital Journalist.
-			data = requests.post(
-				url = 'https://api.groupme.com/v3/bots/post', 
-				params = {
-					'bot_id'  : os.getenv('JOURNALIST_BOT_ID'),
-					'text' : msg,
-					'attachments' : [
-   						{
-							'type' : 'image',
-							'url'  : image_url
-						}
-					]
-				},
-				data = {
-					'text' : 'Image',
-					'picture_url' : image_url
-				}
-			)
-			log('The Digital Journalist Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
-
-def log(msg): #Printing log information.
-	print(str(msg))
-	sys.stdout.flush()
+nlp = English()
 
 
 #----------------------------The Talker----------------------------#
@@ -83,24 +19,10 @@ def log(msg): #Printing log information.
 #~~~~~~~~~~~~~~~ Endpoint for GroupMe messages.
 @app.route('/', methods=['POST'])
 def webhook():
-	global message_count
 	data = request.get_json()
-	if data['name'] != 'The Talker' and data['name'] != 'The Assistant':
+	if data['sender_type'] == 'user':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
-
-		if data['text'][0] == '?': 
-				post_message('The Talker', '?', '')
-		for i in range(len(data['text'])): #Scan for keywords.
-			if data['text'][i:i+4].lower() == 'joke': #laughs
-				read_joke()
-			if data['text'][i:i+5].lower() == 'quote': #motivation
-				read_quote()
-			if data['text'][i:i+4].lower() == 'The Talker': #laughs
-				post_message('Hehehe', '?', '')
-
-		message_count += 1 #Tracking messages sent.
-		if message_count > 9:
-			post_message('The Talker', "My oh my! We've already reached 10 messages! Since my last update, that is.", '')
+		scan_message(data)
 
 	return "ok", 200
 
@@ -116,6 +38,12 @@ def read_joke(): #Telling a joke.
 	joke = linecache.getline('jokes.txt', x)
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
+
+def scan_message(msg): #Using NLP to process the user's message.
+	doc = nlp(msg)
+	for token in doc:
+		if token.is_punct:
+			post_message('The Talker', 'Thank you for using punctuation!', '')
 
 
 #----------------------------The Digital Journalist----------------------------#
@@ -222,3 +150,69 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 	image_url = (data.json()['payload']['url'])
 	post_message('The Digital Journalist', msg, image_url)
 	post_message('The Digital Journalist', verse, '')
+
+
+#----------------------------General Methods
+def post_message(bot_name, msg, image_url): #Sending a message to the group chat.
+	if image_url == '': #Post message without photo.
+		if bot_name == 'The Talker': #Post message from Talker.
+			data = requests.post(
+				url = 'https://api.groupme.com/v3/bots/post', 
+				data = {
+					'bot_id'  : os.getenv('TALKER_BOT_ID'),
+					'text' : msg,
+				}
+			)
+			log('The Talker Log: Message: "{}" was posted. {}'.format(msg, data))
+		elif bot_name == 'The Digital Journalist': #Post message from The Digital Journalist.
+			data = requests.post(
+				url = 'https://api.groupme.com/v3/bots/post', 
+				data = {
+					'bot_id'  : os.getenv('JOURNALIST_BOT_ID'),
+					'text' : msg,
+				}
+			)
+			log('The Digital Journalist Log: Message: "{}" was posted. {}'.format(msg, data))
+	else: #Post message with photo.
+		if bot_name == 'The Talker': #Post message from The Talker.
+			data = requests.post(
+				url = 'https://api.groupme.com/v3/bots/post', 
+				params = {
+					'bot_id'  : os.getenv('Talker_BOT_ID'),
+					'text' : msg,
+					'attachments' : [
+   						{
+							'type' : 'image',
+							'url'  : image_url
+						}
+					]
+				},
+				data = {
+					'text' : 'Image',
+					'picture_url' : image_url
+				}
+			)
+			log('The Talker Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
+		elif bot_name == 'The Digital Journalist': #Post message from The Digital Journalist.
+			data = requests.post(
+				url = 'https://api.groupme.com/v3/bots/post', 
+				params = {
+					'bot_id'  : os.getenv('JOURNALIST_BOT_ID'),
+					'text' : msg,
+					'attachments' : [
+   						{
+							'type' : 'image',
+							'url'  : image_url
+						}
+					]
+				},
+				data = {
+					'text' : 'Image',
+					'picture_url' : image_url
+				}
+			)
+			log('The Digital Journalist Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
+
+def log(msg): #Printing log information.
+	print(str(msg))
+	sys.stdout.flush()

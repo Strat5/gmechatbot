@@ -16,20 +16,6 @@ Heroku offers free 24/7 hosting, but with limited computer hours, so certain tim
 Flask is imported in the code to handle HTTP POST requests.
 The files in this GitHub directory are uploaded to Heroku automatically.
 
-EXPLANTATION OF THE APPLICATION FILES:
-
-Procfile - This tells Heroku what basic service to run.
-
-runtime.txt - This tells Heroku what code enviroment I am using in my code.
-
-requirements.txt - This tells Heroku what additional--in this case we have python--packages to install.
-
-app.py - The main application, where all the bot magic occurs.
-
-jokes.txt - A list of joke needed by the bot.
-
-quotes.txt - A list of motivational quotes need by the bot.
-
 OVERVIEW OF APP.PY:
 
 The indivdual parts of the code should be clearly explained by comments. *If there is a space where this is not the case, please fix it.*

@@ -23,7 +23,6 @@ def webhook():
 	if data['sender_type'] == 'user':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 		scan_message(data)
-
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.

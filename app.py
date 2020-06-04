@@ -9,10 +9,9 @@ import linecache
 import datetime
 import wget
 import time
-import spacy
-import en_core_web_sm
+from spacy.lang.en import English
 app = Flask(__name__)
-nlp = nlp = en_core_web_sm.load() #Load a generic pretrain model from spacy.
+nlp = English() 
 
 
 #----------------------------The Talker----------------------------#

@@ -1,4 +1,4 @@
-##Explanation of each File in the Application
+## Explanation of each file in the application.
 
 Procfile - This tells Heroku what basic service to run.
 
@@ -8,6 +8,6 @@ requirements.txt - This tells Heroku what additional--in this case we have pytho
 
 app.py - The main application, where all the bot magic occurs.
 
-jokes.txt - A list of joke needed by the bot.
+jokes.txt - A list of jokes needed by the bot.
 
 quotes.txt - A list of motivational quotes need by the bot.

@@ -10,9 +10,9 @@ import datetime
 import wget
 import time
 import spacy
-import en_core_web_md
+import en_core_web_sm
 app = Flask(__name__)
-nlp = en_core_web_md.load()
+nlp = en_core_web_sm.load()
 
 
 #----------------------------The Talker----------------------------#

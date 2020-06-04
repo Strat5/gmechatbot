@@ -21,7 +21,7 @@ The code is mainly seperated into two functions and likewise two different bots.
 
 ## Understanding the code:
 
-The indivdual parts of the code should be clearly explained by comments. *If there is a space where this is not the case, please fix it.*
+The indivdual parts of the code should be clearly explained by the commenting. *If there is a space where this is not the case, please fix it.*
 
 There are two special features that the bot incorporates:
 
@@ -29,4 +29,4 @@ There are two special features that the bot incorporates:
 Here is a great video explaining APIs: https://safeyoutube.net/w/DPXI.
 
 - The use of a NLP module: It allows the chatbot to sort through any given message and try to find the intent of the message, among other things.
-Here is great resource: https://www.sas.com/en_us/insights/analytics/what-is-natural-language-processing-nlp.html
+Here is great resource: https://www.sas.com/en_us/insights/analytics/what-is-natural-language-processing-nlp.html.

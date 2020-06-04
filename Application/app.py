@@ -43,6 +43,11 @@ def scan_message(msg): #Using NLP to process the user's message.
 	for token in doc:
 		if token.is_punct:
 			post_message('The Talker', 'Thank you for using punctuation!', '')
+			log('The Talker Log: Punctuation was detected in the message.')
+		if token.text == 'joke':
+			read_joke()
+		if token.text == 'quote':
+			read_quote()
 
 
 #----------------------------The Digital Journalist----------------------------#

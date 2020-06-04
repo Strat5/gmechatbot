@@ -9,7 +9,7 @@ import linecache
 import datetime
 import wget
 import time
-from spacy
+import spacy
 import en_core_web_md
 app = Flask(__name__)
 nlp = en_core_web_md.load()

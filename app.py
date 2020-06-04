@@ -9,7 +9,7 @@ import linecache
 import datetime
 import wget
 import time
-from spac.lang.en import English
+from spacy.lang.en import English
 app = Flask(__name__)
 nlp = English()
 

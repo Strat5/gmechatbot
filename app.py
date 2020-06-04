@@ -9,9 +9,9 @@ import linecache
 import datetime
 import wget
 import time
-from spacy.lang.en import English
+import spacy
 app = Flask(__name__)
-nlp = English()
+nlp = spacy.load('en_core_web_sm') #Load a generic pretrain model from spacy.
 
 
 #----------------------------The Talker----------------------------#
@@ -22,7 +22,7 @@ def webhook():
 	data = request.get_json()
 	if data['sender_type'] == 'user':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
-		scan_message(data)
+		scan_message(data['text'])
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.

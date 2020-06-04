@@ -3,3 +3,4 @@ gunicorn==20.0.4
 requests==2.23.0
 wget==3.2
 spacy==2.2.4
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.5/en_core_web_sm-2.2.5.tar.gz

@@ -9,9 +9,10 @@ import linecache
 import datetime
 import wget
 import time
-from spacy.lang.en import English
+from spacy
+import en_core_web_md
 app = Flask(__name__)
-nlp = English() 
+nlp = en_core_web_md.load()
 
 
 #----------------------------The Talker----------------------------#

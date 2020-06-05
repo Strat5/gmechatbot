@@ -1,11 +1,11 @@
 ## Simple Guidelines:
 
-- Please use commenting to help others understand your code more quickly.
-- Please make sure the commenting is short, but informative.
-- Do not add any material that would only be appropiate for a higher age group.
-- Only add or work on features that are in the official to-do list on Github. 
+- For editing snipits of the code: please use short but informative commenting where you deem it would help others understand your addition quicker. 
+- For better commenting, check out this article: https://www.elegantthemes.com/blog/wordpress/how-to-comment-your-code-like-a-pro-best-practices-and-good-habits.
+- For adding any new feature: please make sure it is listed on the offical to-do list.
+- For adding any new quotes, jokes, etc: Do not add any material that would only be appropiate for a higher age group.
 
-Note: The master branch on this repositiory auto deploys to Github, please do not submit a pull request from a fork with an incomplete feature.
+Note: The master branch on this repositiory auto deploys to Github; please do not submit a pull request from a fork with a known bug.
 
 ## Resources: 
 

@@ -91,7 +91,7 @@ def read_weather(): #Explaining the weather forecast.
 
 def read_news(query): #Detailing top headlines.
 	if query != '':
-		log('The Digital Journalist Log: Asking for news about "{}."').format(query)
+		log('The Digital Journalist Log: Asking for news about "{}."'.format(query))
 		url_query = 'q=' + query + '&' #add the url format to custom news request
 
 	data = requests.get(#get the top thirty US headlines, with an optional custom query

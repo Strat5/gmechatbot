@@ -45,6 +45,7 @@ def read_joke(): #Telling a joke.
 def scan_message(msg): #Using NLP to process the user's message.
 	doc = nlp(msg)
 	is_punct_msgsent = False 
+
 	for token in doc: #iterate over each token (a word or punctuation)
 		if token.is_punct:  
 			if is_punct_msgsent == False: 
@@ -56,6 +57,8 @@ def scan_message(msg): #Using NLP to process the user's message.
 			read_joke()
 		if token.text.lower()[0:5] == 'quote':
 			read_quote()
+		if token.text.lower()[0:4] == 'news':
+			read_news(doc[token.i - 1].lower())
 
 
 #----------------------------The Digital Journalist----------------------------#
@@ -67,7 +70,7 @@ def webhook():
 	return "ok", 200
 @app.route('/news', endpoint = 'news', methods=['POST'])
 def webhook():
-	read_news()
+	read_news('')
 	return "ok", 200
 @app.route('/history', endpoint = 'history', methods=['POST'])
 def webhook():
@@ -86,9 +89,12 @@ def read_weather(): #Explaining the weather forecast.
 	log('The Digital Journalist Log: Recieved Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
-def read_news(): #Detailing top headlines.
+def read_news(query): #Detailing top headlines.
+	if query != '':
+		url_query = 'q=' + query + '&' #add the url format to custom news request
+
 	data = requests.get(#get the top thirty headlines
-		url = 'https://newsapi.org/v2/top-headlines?country=us&pageSize=30&apiKey={}'.format(os.getenv('NEWS_API_KEY'))
+		url = 'https://newsapi.org/v2/top-headlines?country=us&{}pageSize=30&apiKey={}'.format(url_query, os.getenv('NEWS_API_KEY'))
 	)
 	log("The Digital Journalist Log: Recieved Today's News. {}".format(data))
 	

@@ -1,4 +1,4 @@
-##Simple Guidelines:
+## Simple Guidelines:
 
 - Please use commenting to help others understand your code more quickly.
 - Please make sure the commenting is short, but informative.
@@ -7,7 +7,7 @@
 
 Note: The master branch on this repositiory auto deploys to Github, please do not submit a pull request from a fork with an incomplete feature.
 
-##Resources: 
+## Resources: 
 
 Spacy NLP Documentation: 
 	https://spacy.io/api/doc (Use the sidebar on the left to have acess to more of the feature documentation.)

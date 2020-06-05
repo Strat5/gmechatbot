@@ -12,6 +12,7 @@ import time
 import spacy
 from spacy.matcher import Matcher
 import en_core_web_sm
+
 app = Flask(__name__)
 nlp = en_core_web_sm.load()
 matcher = Matcher(nlp.vocab)
@@ -43,12 +44,13 @@ def read_joke(): #Telling a joke.
 
 def scan_message(msg): #Using NLP to process the user's message.
 	doc = nlp(msg)
-	is_punct_msgsent = False
+	is_punct_msgsent = False 
 	for token in doc: #iterate over each token (a word or punctuation)
-		if token.is_punct: #check if it is punctuation 
-			if is_punct_msgsent: #check if the punctuation message has already been sent
+		if token.is_punct:  
+			if is_punct_msgsent == False: 
 				post_message('The Talker', 'Thank you for using punctuation!', '')
 				log('The Talker Log: Punctuation was detected in the message.')
+				is_punct_msgsent == True
 		#Keywords.
 		if token.text.lower()[0:4] == 'joke':
 			read_joke()

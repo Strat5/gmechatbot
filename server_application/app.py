@@ -58,7 +58,7 @@ def scan_message(msg): #Using NLP to process the user's message.
 		if token.text.lower()[0:5] == 'quote':
 			read_quote()
 		if token.text.lower()[0:4] == 'news':
-			read_news(doc[token.i - 1].lower())
+			read_news(doc[token.i - 1].text.lower())
 
 
 #----------------------------The Digital Journalist----------------------------#

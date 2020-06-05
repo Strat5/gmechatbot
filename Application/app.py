@@ -22,7 +22,7 @@ nlp = en_core_web_sm.load()
 @app.route('/', methods=['POST'])
 def webhook():
 	data = request.get_json()
-	if data['sender_type'] == 'user':
+	if data['sender_type'] == 'user': #did the user send the message?
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 		scan_message(data['text'])
 	return "ok", 200
@@ -30,20 +30,20 @@ def webhook():
 #~~~~~~~~~~~~~~~ Methods.
 def read_quote(): #Reading a quote.
 	x = randint(1, 81)
-	quote = linecache.getline('quotes.txt', x)
+	quote = linecache.getline('quotes.txt', x) #reading a random line in the file
 	log('The Talker Log: Quote has been read.')
 	post_message('The Talker', quote, '')
 
 def read_joke(): #Telling a joke.
 	x = randint(1, 61)
-	joke = linecache.getline('jokes.txt', x)
+	joke = linecache.getline('jokes.txt', x) #reading a random line in the file
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
 
 def scan_message(msg): #Using NLP to process the user's message.
 	doc = nlp(msg)
-	for token in doc:
-		if token.is_punct:
+	for token in doc: #iterate over each token (a word or punctuation)
+		if token.is_punct: #check if it is punctuation 
 			post_message('The Talker', 'Thank you for using punctuation!', '')
 			log('The Talker Log: Punctuation was detected in the message.')
 		if token.text == 'joke':
@@ -74,14 +74,14 @@ def webhook():
 
 #~~~~~~~~~~~~~~~ Methods.
 def read_weather(): #Explaining the weather forecast.
-	data = requests.get(
+	data = requests.get( #get the weather at Oakdale, Minnesota, in Imperial units
 		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
 	)
 	log('The Digital Journalist Log: Recieved Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 def read_news(): #Detailing top headlines.
-	data = requests.get(
+	data = requests.get(#get the top thirty headlines
 		url = 'https://newsapi.org/v2/top-headlines?country=us&pageSize=30&apiKey={}'.format(os.getenv('NEWS_API_KEY'))
 	)
 	log("The Digital Journalist Log: Recieved Today's News. {}".format(data))
@@ -91,7 +91,8 @@ def read_news(): #Detailing top headlines.
 	story2 = randint(0, 30)
 	story3 = randint(0, 30)
 
-	if(story2 == story1):	#Check once to see if there is a duplicate event in the list.
+	#Check once to see if there is a duplicate event in the list.
+	if(story2 == story1): 
 		story2 = randint(0, 30)
 	if(story3 == story1 or story3 == story2):
 		story3 = randint(0, 30)
@@ -104,17 +105,20 @@ def read_history(): #Recalling the events of the past.
 		)
 	log("The Digital Journalist Log: Recieved Today's History. {}".format(data))
 
-	limit = len(data.json()['data']['Events']) #Determine three random events to display.
+	#Determine three random events to display.
+	limit = len(data.json()['data']['Events']) 
 	story1 = randint(0, limit + 1)
 	story2 = randint(0, limit + 1)
 	story3 = randint(0, limit + 1)
 
-	if(story2 == story1):	#Check once to see if there is a duplicate event in the list.
+	#Check once to see if there is a duplicate event in the list.
+	if(story2 == story1):	
 		story2 = randint(0, limit + 1)
 	if(story3 == story1 or story3 == story1):
 		story3 = randint(0, limit + 1)
 
-	for i in range(2): #Scan the events twice to make sure the dates are in order.
+	#Scan the events twice to make sure the dates are in order.
+	for i in range(2): 
 		if(data.json()['data']['Events'][story1]['year'] > data.json()['data']['Events'][story2]['year']):
 			x = story1
 			story1 = story2
@@ -136,10 +140,9 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 			'accept-language' : 'en'
 		}
 	)
-	verse = data.json()['verse']['text'] + '\n-' + data.json()['verse']['human_reference'] 
 	log('The Digital Journalist Log: Recieved VOTD. {}'.format(data))
-
-
+	
+	verse = data.json()['verse']['text'] + '\n-' + data.json()['verse']['human_reference'] 
 	data = wget.download(data.json()['image']['url'][56:]) #Download the picture from Youversion.
 	log('The Digital Journalist Log: Image Download from YouVersion Complete.')
   
@@ -151,10 +154,9 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 	)
 	log('The Digital Journalist Log: Image Upload to GroupMe Complete. {}'.format(data))
 
-
-	msg = '', #Post the image to the chat.
+	#Post the image to the chat.
 	image_url = (data.json()['payload']['url'])
-	post_message('The Digital Journalist', msg, image_url)
+	post_message('The Digital Journalist', '', image_url)
 	post_message('The Digital Journalist', verse, '')
 
 

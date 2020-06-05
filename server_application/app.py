@@ -43,16 +43,16 @@ def read_joke(): #Telling a joke.
 
 def scan_message(msg): #Using NLP to process the user's message.
 	doc = nlp(msg)
-	is_punct_msgsent = false
+	is_punct_msgsent = False
 	for token in doc: #iterate over each token (a word or punctuation)
 		if token.is_punct: #check if it is punctuation 
 			if is_punct_msgsent: #check if the punctuation message has already been sent
 				post_message('The Talker', 'Thank you for using punctuation!', '')
 				log('The Talker Log: Punctuation was detected in the message.')
 		#Keywords.
-		if token.text[0:4].lower() == 'joke':
+		if token.text.lower()[0:4] == 'joke':
 			read_joke()
-		if token.text[0:5].lower() == 'quote':
+		if token.text.lower()[0:5] == 'quote':
 			read_quote()
 
 

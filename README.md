@@ -16,6 +16,8 @@ But the hope is that the final product will be a function (and practical) additi
 
 Installation guide coming soon.
 
+Note: The bot is designed to be ran on Heroku with a gunicorn setup.
+
 ## 🤝 Contributing:
 
 Contributions, issues and feature requests are welcome!

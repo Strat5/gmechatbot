@@ -31,13 +31,13 @@ def webhook():
 
 #~~~~~~~~~~~~~~~ Methods.
 def read_quote(): #Reading a quote.
-	x = randint(1, 81)
+	x = randint(1, 80)
 	quote = linecache.getline('quotes.txt', x) #reading a random line in the file
 	log('The Talker Log: Quote has been read.')
 	post_message('The Talker', quote, '')
 
 def read_joke(): #Telling a joke.
-	x = randint(1, 61)
+	x = randint(1, 60)
 	joke = linecache.getline('jokes.txt', x) #reading a random line in the file
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
@@ -47,11 +47,6 @@ def scan_message(msg): #Using NLP to process the user's message.
 	is_punct_msgsent = False 
 
 	for token in doc: #iterate over each token (a word or punctuation)
-		if token.is_punct:  
-			if is_punct_msgsent == False: 
-				post_message('The Talker', 'Thank you for using punctuation!', '')
-				log('The Talker Log: Punctuation was detected in the message.')
-				is_punct_msgsent == True
 		#Keywords.
 		if token.text.lower()[0:4] == 'joke':
 			read_joke()
@@ -100,15 +95,15 @@ def read_news(query): #Detailing top headlines.
 	log("The Digital Journalist Log: Recieved The News. {}".format(data))
 	
 	limit = data.json()['totalResults']
-	story1 = randint(0, limit)
-	story2 = randint(0, limit)
-	story3 = randint(0, limit)
+	story1 = randint(0, limit - 1)
+	story2 = randint(0, limit - 1)
+	story3 = randint(0, limit - 1)
 
 	#Check once to try to fix a duplicate event in the list.
 	if(story2 == story1): 
-		story2 = randint(0, limit)
+		story2 = randint(0, limit - 1)
 	if(story3 == story1 or story3 == story2):
-		story3 = randint(0, limit)
+		story3 = randint(0, limit - 1)
 
 	story1_description = data.json()['articles'][story1]['description']
 	story2_description = data.json()['articles'][story2]['description']
@@ -117,7 +112,7 @@ def read_news(query): #Detailing top headlines.
 	story2_url = data.json()['articles'][story2]['url']
 	story3_url = data.json()['articles'][story3]['url']
 
-	post_message('The Digital Journalist', "Today's Top News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(story1_description, story1_url, story2_description, dstory2_url, story3_description, story3_url),'')
+	post_message('The Digital Journalist', "Today's Top News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
 
 def read_history(): #Recalling the events of the past.
 	data = requests.get(
@@ -127,15 +122,15 @@ def read_history(): #Recalling the events of the past.
 
 	#Determine three random events to display.
 	limit = len(data.json()['data']['Events']) 
-	story1 = randint(0, limit + 1)
-	story2 = randint(0, limit + 1)
-	story3 = randint(0, limit + 1)
+	story1 = randint(0, limit - 1)
+	story2 = randint(0, limit - 1)
+	story3 = randint(0, limit - 1)
 
 	#Check once to see if there is a duplicate event in the list.
 	if(story2 == story1):	
-		story2 = randint(0, limit + 1)
+		story2 = randint(0, limit - 1)
 	if(story3 == story1 or story3 == story1):
-		story3 = randint(0, limit + 1)
+		story3 = randint(0, limit - 1)
 
 	#Scan the events twice to make sure the dates are in order.
 	for i in range(2): 

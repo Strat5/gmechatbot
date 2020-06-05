@@ -14,6 +14,7 @@ from spacy.matcher import Matcher
 import en_core_web_sm
 app = Flask(__name__)
 nlp = en_core_web_sm.load()
+matcher = Matcher(nlp.vocab)
 
 
 #----------------------------The Talker----------------------------#
@@ -45,13 +46,13 @@ def scan_message(msg): #Using NLP to process the user's message.
 	is_punct_msgsent = false
 	for token in doc: #iterate over each token (a word or punctuation)
 		if token.is_punct: #check if it is punctuation 
-			if is_punct_msgsent: #check if the message has already been sent
+			if is_punct_msgsent: #check if the punctuation message has already been sent
 				post_message('The Talker', 'Thank you for using punctuation!', '')
 				log('The Talker Log: Punctuation was detected in the message.')
 		#Keywords.
-		if token.text[0:4] == 'joke':
+		if token.text[0:4].lower() == 'joke':
 			read_joke()
-		if token.text[0:5] == 'quote':
+		if token.text[0:5].lower() == 'quote':
 			read_quote()
 
 
@@ -145,7 +146,7 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 	)
 	log('The Digital Journalist Log: Recieved VOTD. {}'.format(data))
 	
-	verse = data.json()['verse']['text'] + '\n-' + data.json()['verse']['human_reference'] 
+	verse = data.json()['verse']['text'] + '\n- ' + data.json()['verse']['human_reference'] 
 	data = wget.download(data.json()['image']['url'][56:]) #Download the picture from Youversion.
 	log('The Digital Journalist Log: Image Download from YouVersion Complete.')
   

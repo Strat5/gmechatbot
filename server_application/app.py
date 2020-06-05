@@ -91,25 +91,33 @@ def read_weather(): #Explaining the weather forecast.
 
 def read_news(query): #Detailing top headlines.
 	if query != '':
+		log('The Digital Journalist Log: Asking for news about "{}."').format(query)
 		url_query = 'q=' + query + '&' #add the url format to custom news request
 
-	data = requests.get(#get the top thirty headlines
+	data = requests.get(#get the top thirty US headlines, with an optional custom query
 		url = 'https://newsapi.org/v2/top-headlines?country=us&{}pageSize=30&apiKey={}'.format(url_query, os.getenv('NEWS_API_KEY'))
 	)
-	log("The Digital Journalist Log: Recieved Today's News. {}".format(data))
+	log("The Digital Journalist Log: Recieved The News. {}".format(data))
 	
-	#Determine three random events to display.
-	story1 = randint(0, 30)
-	story2 = randint(0, 30)
-	story3 = randint(0, 30)
+	limit = data.json()['totalResults']
+	story1 = randint(0, limit)
+	story2 = randint(0, limit)
+	story3 = randint(0, limit)
 
-	#Check once to see if there is a duplicate event in the list.
+	#Check once to try to fix a duplicate event in the list.
 	if(story2 == story1): 
-		story2 = randint(0, 30)
+		story2 = randint(0, limit)
 	if(story3 == story1 or story3 == story2):
-		story3 = randint(0, 30)
+		story3 = randint(0, limit)
 
-	post_message('The Digital Journalist', "Today's Top News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(data.json()['articles'][story1]['description'], data.json()['articles'][story1]['url'], data.json()['articles'][story2]['description'], data.json()['articles'][story2]['url'], data.json()['articles'][story3]['description'], data.json()['articles'][story3]['url']),'')
+	story1_description = data.json()['articles'][story1]['description']
+	story2_description = data.json()['articles'][story2]['description']
+	story3_description = data.json()['articles'][story3]['description']
+	story1_url = data.json()['articles'][story1]['url']
+	story2_url = data.json()['articles'][story2]['url']
+	story3_url = data.json()['articles'][story3]['url']
+
+	post_message('The Digital Journalist', "Today's Top News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(story1_description, story1_url, story2_description, dstory2_url, story3_description, story3_url),'')
 
 def read_history(): #Recalling the events of the past.
 	data = requests.get(

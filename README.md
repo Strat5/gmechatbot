@@ -22,14 +22,14 @@ Note: The bot is designed to be ran on Heroku with a gunicorn setup.
 
 Contributions, issues and feature requests are welcome!
 
-The main purpose of this project is to learn; don't hesitate to submit because you're afraid to mess up.
+The main purpose of this project is to learn; don't hesitate to ask questions!
 
 If you are new to Github and want to contribute try reading these tutorials:
 
-	- Here is a tutorial to Git and Github: https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners.
-	- More specifically, here is how you can edit my project: https://guides.github.com/activities/forking/.
+- Here is a tutorial to Git and Github: https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners.
+- More specifically, here is how you can edit my project: https://guides.github.com/activities/forking/.
 
-*Just please try to keep your edited code commenting simple but effective.*
+*Please see the contributing.md file for more info.*
 
 ## 👍 Acknowledgements:
 
@@ -40,5 +40,3 @@ A big thank you to all these free services!
 - WeatherBit API: https://www.weatherbit.io/api
 - Today’s History API: https://history.muffinlabs.com/#api
 - News API: https://newsapi.org/
-
-*If you have any questions about this project please don't hesitate to ask.*

@@ -10,6 +10,7 @@ import datetime
 import wget
 import time
 import spacy
+from spacy.matcher import Matcher
 import en_core_web_sm
 app = Flask(__name__)
 nlp = en_core_web_sm.load()

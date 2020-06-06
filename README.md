@@ -41,6 +41,7 @@ Contributions, issues and feature requests are welcome!
 
 The main purpose of this project is to learn; don't hesitate to ask questions!
 
+To start, try adding a new joke or motovational quote to the bot.
 If you are new to Github and want to contribute try reading these tutorials:
 
 - Here is a tutorial to Git and Github: https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners.

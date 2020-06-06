@@ -81,7 +81,7 @@ def read_weather(): #Explaining the weather forecast.
 	data = requests.get( #get the weather at Oakdale, Minnesota, in Imperial units
 		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
 	)
-	log('The Digital Journalist Log: Recieved Weather. {}'.format(data))
+	log('The Digital Journalist Log: Received Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 def read_news(query): #Detailing top headlines.
@@ -92,7 +92,7 @@ def read_news(query): #Detailing top headlines.
 	data = requests.get(#get the top thirty US headlines, with an optional custom query
 		url = 'https://newsapi.org/v2/top-headlines?country=us&{}pageSize=30&apiKey={}'.format(url_query, os.getenv('NEWS_API_KEY'))
 	)
-	log("The Digital Journalist Log: Recieved The News. {}".format(data))
+	log("The Digital Journalist Log: Received The News. {}".format(data))
 	
 	limit = data.json()['totalResults']
 	story1 = randint(0, limit - 1)
@@ -118,7 +118,7 @@ def read_history(): #Recalling the events of the past.
 	data = requests.get(
 		url = 'http://history.muffinlabs.com/date'
 		)
-	log("The Digital Journalist Log: Recieved Today's History. {}".format(data))
+	log("The Digital Journalist Log: Received Today's History. {}".format(data))
 
 	#Determine three random events to display.
 	limit = len(data.json()['data']['Events']) 
@@ -155,7 +155,7 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 			'accept-language' : 'en'
 		}
 	)
-	log('The Digital Journalist Log: Recieved VOTD. {}'.format(data))
+	log('The Digital Journalist Log: Received VOTD. {}'.format(data))
 	
 	verse = data.json()['verse']['text'] + '\n- ' + data.json()['verse']['human_reference'] 
 	data = wget.download(data.json()['image']['url'][56:]) #Download the picture from Youversion.

@@ -18,6 +18,10 @@ Installation guide coming soon.
 
 Note: The bot is designed to be ran on Heroku with a gunicorn setup.
 
+## ⌨️ Usage: 
+
+Usage guide coming soon.
+
 ## 🤝 Contributing:
 
 Contributions, issues and feature requests are welcome!

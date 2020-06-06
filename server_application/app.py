@@ -42,18 +42,36 @@ def read_joke(): #Telling a joke.
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
 
-def scan_message(msg): #Using NLP to process the user's message.
+def scan_message(msg): #Using NLP to process the user's message. TODO: Add more log messages and better commenting.
 	doc = nlp(msg)
-	is_punct_msgsent = False 
-
 	for token in doc: #iterate over each token (a word or punctuation)
 		#Keywords.
 		if token.text.lower()[0:4] == 'joke':
 			read_joke()
 		if token.text.lower()[0:5] == 'quote':
 			read_quote()
-		if token.text.lower()[0:4] == 'news':
-			read_news(doc[token.i - 1].text.lower())
+
+	#Spacy matching patterns for custom news 
+	matcher.add("CUSTOM_NEWS_PATTERN1", None, [{"POS":"NOUN"}, {"LOWER":"news"}])   
+	matcher.add("CUSTOM_NEWS_PATTERN2", None, [{'LOWER': 'news'}, {'POS': 'ADP'}, {'POS': 'NOUN'}])
+	matcher.add("CUSTOM_NEWS_PATTERN3", None, [{"POS":"PROPN"}, {"LOWER":"news"}])   
+	matcher.add("CUSTOM_NEWS_PATTERN4", None, [{'LOWER': 'news'}, {'POS': 'ADP'}, {'POS': 'PROPN'}])
+	matches = matcher(doc)
+
+	# Iterate over the matches and tokens to find the catagory
+	found_news_catagory = False
+	for match_id, start, end in matches:
+		for token in doc[start:end]:
+			if token.text.lower() != 'news' and token.pos_ != 'ADP':
+				possible_catagories = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology']
+				for i in possible_catagories:
+					if token.text == possible_catagories[i]:
+						found_news_catagory = True
+						read_news(token.text)
+						log('The Talker Log: Asking The Journalist for news about {}.'.format(token.text))
+						break
+				if found_news_catagory == False:
+					post_message("It appears that you requested news, but you did not provide an acceptable catagory. Try asking for news about: business, entertainment, general, health, science, sports, technology.")
 
 
 #----------------------------The Digital Journalist----------------------------#
@@ -84,26 +102,30 @@ def read_weather(): #Explaining the weather forecast.
 	log('The Digital Journalist Log: Received Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
-def read_news(query): #Detailing top headlines.
-	if query != '':
+def read_news(catagory): #Detailing top headlines.
+	if catagory != '':
 		log('The Digital Journalist Log: Asking for news about "{}."'.format(query))
-		url_query = 'q=' + query + '&' #add the url format to custom news request
+		
+	else: 
+		catagory == 'general'
+		log("The Digital Journalist Log: Asking for today's top news.")
 
+	url_query = 'catagory=' + catagory + '&' #add the url format to custom news request
 	data = requests.get(#get the top thirty US headlines, with an optional custom query
-		url = 'https://newsapi.org/v2/top-headlines?country=us&{}pageSize=30&apiKey={}'.format(url_query, os.getenv('NEWS_API_KEY'))
+		url = 'https://newsapi.org/v2/top-headlines?country=us&{}apiKey={}'.format(url_query, os.getenv('NEWS_API_KEY'))
 	)
 	log("The Digital Journalist Log: Received The News. {}".format(data))
 	
 	limit = data.json()['totalResults']
-	story1 = randint(0, limit - 1)
-	story2 = randint(0, limit - 1)
-	story3 = randint(0, limit - 1)
+	story1 = randint(0, 19)
+	story2 = randint(0, 19)
+	story3 = randint(0, 19)
 
 	#Check once to try to fix a duplicate event in the list.
 	if(story2 == story1): 
-		story2 = randint(0, limit - 1)
+		story2 = randint(0, 19)
 	if(story3 == story1 or story3 == story2):
-		story3 = randint(0, limit - 1)
+		story3 = randint(0, 19)
 
 	story1_description = data.json()['articles'][story1]['description']
 	story2_description = data.json()['articles'][story2]['description']
@@ -111,8 +133,9 @@ def read_news(query): #Detailing top headlines.
 	story1_url = data.json()['articles'][story1]['url']
 	story2_url = data.json()['articles'][story2]['url']
 	story3_url = data.json()['articles'][story3]['url']
+	better_title = catagory[0].upper() + catagory[1:]
 
-	post_message('The Digital Journalist', "Today's Top News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
+	post_message('The Digital Journalist', "The Today' Top {} News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, catagorystory1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
 
 def read_history(): #Recalling the events of the past.
 	data = requests.get(

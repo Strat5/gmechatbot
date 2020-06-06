@@ -1,6 +1,6 @@
 ## 📖 Purpose: 
 
-The primary purpose of this project is to learn together. 
+The primary purpose of this project is to learn about and have fun while creating a chatbot. 
 But the hope is that the final product will be a function (and practical) addition to any groupchat.
 
 ## 🗒 Features:
@@ -9,7 +9,7 @@ But the hope is that the final product will be a function (and practical) additi
 - A seperate bot that can post to the chat daily information including:
 	- The verse of the day.
 	- The weather forecast.
-	- Today's day in history.
+	- This day in history.
 	- Today's top news.
 
 ## 🔨 Installation: 
@@ -20,7 +20,20 @@ Note: The bot is designed to be ran on Heroku with a gunicorn setup.
 
 ## ⌨️ Usage: 
 
-Usage guide coming soon.
+The Talker (one of the two chatbots) will recognize the following keywords in any message:
+	- 'joke' : and will send a joke to the groupchat.
+	- 'quote' : and will send a quote to the groupchat
+
+The Talker will also try to use natural language processing (so neither my implementation nor the actual model is perfect) to recognize a request for the following catagories of top news headlines:
+	- business
+	- entertainment
+	- general 
+	- health
+	- science
+	- sports
+	- technology
+
+Using the automatic pings setup in the installation section, you can customize exactly what time you would like any of the daily information (the second part of the features section) sent to the groupchat.
 
 ## 🤝 Contributing:
 

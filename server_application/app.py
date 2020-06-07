@@ -115,7 +115,7 @@ def webhook():
 @app.route('/verse', endpoint = 'verse', methods=['POST'])
 def webhook():
 	log('The Digital Journalist Log: Received a ping to the /verse endpoint.')
-	read_votd()
+	read_verse()
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
@@ -191,7 +191,7 @@ def read_history(): #Recalling the events of the past.
 	date = data.json()['date']
 	post_message('The Digital Journalist', 'Today in History, {}: \n\n{}, {}\n\n{}, {}\n\n{}, {}'.format(date, data.json()['data']['Events'][story1]['year'], data.json()['data']['Events'][story1]['text'], data.json()['data']['Events'][story2]['year'], data.json()['data']['Events'][story2]['text'], data.json()['data']['Events'][story3]['year'], data.json()['data']['Events'][story3]['text']), '')
 
-def read_votd(): #Downloading and uploading verse of tbe day picture.
+def read_verse(): #Downloading and uploading verse of tbe day picture.
 	dayNumber = (datetime.date.today() - datetime.date(2020, 1, 1)).days
 	data = requests.get( #Request verse and picture url from YouVersion. 
 		url ='https://developers.youversionapi.com/1.0/verse_of_the_day/{}?version_id=1'.format(dayNumber), 
@@ -201,7 +201,7 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 			'accept-language' : 'en'
 		}
 	)
-	log('The Digital Journalist Log: Received VOTD. {}'.format(data))
+	log('The Digital Journalist Log: Received the verse of the day. {}'.format(data))
 	
 	verse = data.json()['verse']['text'] + '\n- ' + data.json()['verse']['human_reference'] 
 	data = wget.download(data.json()['image']['url'][56:]) #Download the picture from Youversion.

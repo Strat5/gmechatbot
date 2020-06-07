@@ -67,11 +67,12 @@ def scan_message(msg): #Using NLP to process the user's message. TODO: Add more 
 				for i in possible_catagories:
 					if token.text.lower() == i:
 						found_news_catagory = True
-						read_news(token.text)
 						log('The Talker Log: Asking The Journalist for news about {}.'.format(token.text))
+						read_news(token.text)
 						break
+
 				if found_news_catagory == False:
-					post_message("It appears that you requested news, but you did not provide an acceptable catagory. Try asking for news about: business, entertainment, general, health, science, sports, technology.")
+					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable catagory. Try asking for news about: business, entertainment, general, health, science, sports, technology.", '')
 
 
 #----------------------------The Digital Journalist----------------------------#
@@ -109,9 +110,9 @@ def read_news(catagory): #Detailing top headlines.
 	else:
 		log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
 
-	url_query = 'catagory=' + catagory + '&' #add the url format to custom news request
-	data = requests.get(#get the top thirty US headlines, with an optional custom query
-		url = 'https://newsapi.org/v2/top-headlines?country=us&{}apiKey={}'.format(url_query, os.getenv('NEWS_API_KEY'))
+	url_category = 'category=' + category + '&' #add the url format to custom news request
+	data = requests.get(#get the top twenty US headlines, with an optional custom query
+		url = 'http://newsapi.org/v2/top-headlines?country=us&{}apiKey={}'.format(url_category, os.getenv('NEWS_API_KEY'))
 	)
 	log("The Digital Journalist Log: Received The News. {}".format(data))
 	
@@ -132,10 +133,9 @@ def read_news(catagory): #Detailing top headlines.
 	story1_url = data.json()['articles'][story1]['url']
 	story2_url = data.json()['articles'][story2]['url']
 	story3_url = data.json()['articles'][story3]['url']
-	log('TEST LOG: {}'.format(catagory))
 	better_title = catagory[0].upper() + catagory[1:]
 
-	post_message('The Digital Journalist', "The Today' Top {} News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
+	post_message('The Digital Journalist', "Top {} Headlines: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
 
 def read_history(): #Recalling the events of the past.
 	data = requests.get(

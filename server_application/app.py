@@ -58,21 +58,21 @@ def scan_message(msg): #Using NLP to process the user's message. TODO: Add more 
 	matcher.add("CUSTOM_NEWS_PATTERN4", None, [{'LOWER': 'news'}, {'POS': 'ADP'}, {'POS': 'PROPN'}])
 	matches = matcher(doc)
 
-	# Iterate over the matches and tokens to find the catagory
-	found_news_catagory = False
+	# Iterate over the matches and tokens to find the category
+	found_news_category = False
 	for match_id, start, end in matches:
 		for token in doc[start:end]:
 			if token.text.lower() != 'news' and token.pos_ != 'ADP':
 				possible_catagories = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology']
 				for i in possible_catagories:
 					if token.text.lower() == i:
-						found_news_catagory = True
+						found_news_category = True
 						log('The Talker Log: Asking The Journalist for news about {}.'.format(token.text))
 						read_news(token.text)
 						break
 
-				if found_news_catagory == False:
-					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable catagory. Try asking for news about: business, entertainment, general, health, science, sports, technology.", '')
+				if found_news_category == False:
+					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, technology.", '')
 
 
 #----------------------------The Digital Journalist----------------------------#
@@ -103,12 +103,12 @@ def read_weather(): #Explaining the weather forecast.
 	log('The Digital Journalist Log: Received Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
-def read_news(catagory): #Detailing top headlines.
-	if catagory == '':
-		catagory = 'general'
+def read_news(category): #Detailing top headlines.
+	if category == '':
+		category = 'general'
 		log("The Digital Journalist Log: Asking for today's top news.")
 	else:
-		log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
+		log('The Digital Journalist Log: Asking for news about "{}."'.format(category))
 
 	url_category = 'category=' + category + '&' #add the url format to custom news request
 	data = requests.get(#get the top twenty US headlines, with an optional custom query
@@ -133,7 +133,7 @@ def read_news(catagory): #Detailing top headlines.
 	story1_url = data.json()['articles'][story1]['url']
 	story2_url = data.json()['articles'][story2]['url']
 	story3_url = data.json()['articles'][story3]['url']
-	better_title = catagory[0].upper() + catagory[1:]
+	better_title = category[0].upper() + category[1:]
 
 	post_message('The Digital Journalist', "Top {} Headlines: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
 

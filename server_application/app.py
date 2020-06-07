@@ -104,7 +104,7 @@ def read_weather(): #Explaining the weather forecast.
 
 def read_news(catagory): #Detailing top headlines.
 	 if catagory != '':
-		log('The Digital Journalist Log: Asking for news about "{}."'.format(query))
+		 log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
 		
 	else: 
 		catagory == 'general'

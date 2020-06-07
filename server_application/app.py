@@ -135,7 +135,7 @@ def read_news(catagory): #Detailing top headlines.
 	log('TEST LOG: {}'.format(catagory))
 	better_title = catagory[0].upper() + catagory[1:]
 
-	post_message('The Digital Journalist', "The Today' Top {} News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, catagorystory1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
+	post_message('The Digital Journalist', "The Today' Top {} News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
 
 def read_history(): #Recalling the events of the past.
 	data = requests.get(

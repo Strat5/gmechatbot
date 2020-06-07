@@ -20,13 +20,23 @@ matcher = Matcher(nlp.vocab)
 
 #----------------------------The Talker----------------------------#
 
-#~~~~~~~~~~~~~~~ Endpoint for GroupMe messages.
-@app.route('/', methods=['POST'])
-def webhook():
+#~~~~~~~~~~~~~~~ Endpoints.
+@app.route('/', methods=['POST']) 
+def webhook():				
 	data = request.get_json()
 	if data['sender_type'] == 'user': #did the user send the message?
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 		scan_message(data['text'])
+	return "ok", 200
+@app.route('/quote', endpoint = 'quote', methods=['POST'])
+def webhook():
+	log('The Talker Log: Received a ping to the /quote endpoint.')
+	read_quote()
+	return "ok", 200
+@app.route('/joke', endpoint = 'joke', methods=['POST'])
+def webhook():
+	log('The Talker Log: Received a ping to the /joke endpoint.')
+	read_joke()
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
@@ -42,7 +52,7 @@ def read_joke(): #Telling a joke.
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
 
-def scan_message(msg): #Using NLP to process the user's message. TODO: Add more log messages and better commenting.
+def scan_message(msg): #Using NLP to process the user's message. 
 	doc = nlp(msg)
 	for token in doc: #iterate over each token (a word or punctuation)
 		#Keywords.
@@ -50,6 +60,14 @@ def scan_message(msg): #Using NLP to process the user's message. TODO: Add more 
 			read_joke()
 		if token.text.lower()[0:5] == 'quote':
 			read_quote()
+		if token.text.lower()[0:7] == 'weather':
+			read_weather()
+		if token.text.lower()[0:4] == 'news':
+			read_news('')
+		if token.text.lower()[0:7] == 'history':
+			read_history()
+		if token.text.lower()[0:5] == 'verse':
+			read_verse()
 
 	#Spacy matching patterns for custom news 
 	matcher.add("CUSTOM_NEWS_PATTERN1", None, [{"POS":"NOUN"}, {"LOWER":"news"}])   
@@ -72,26 +90,31 @@ def scan_message(msg): #Using NLP to process the user's message. TODO: Add more 
 						break
 
 				if found_news_category == False:
-					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, technology.", '')
+					log('The Talker Log: Received an unacceptable news request.')
+					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, or technology.", '')
 
 
 #----------------------------The Digital Journalist----------------------------#
 
-#~~~~~~~~~~~~~~~ Endpoints for cron-scheduled pings. 
+#~~~~~~~~~~~~~~~ Endpoints. 
 @app.route('/weather', endpoint = 'weather', methods=['POST'])
 def webhook():
+	log('The Digital Journalist Log: Received a ping to the /weather endpoint.')
 	read_weather()
 	return "ok", 200
 @app.route('/news', endpoint = 'news', methods=['POST'])
 def webhook():
+	log('The Digital Journalist Log: Received a ping to the /news endpoint.')
 	read_news('')
 	return "ok", 200
 @app.route('/history', endpoint = 'history', methods=['POST'])
 def webhook():
+	log('The Digital Journalist Log: Received a ping to the /history endpoint.')
 	read_history()
 	return "ok", 200
-@app.route('/votd', endpoint = 'votd', methods=['POST'])
+@app.route('/verse', endpoint = 'verse', methods=['POST'])
 def webhook():
+	log('The Digital Journalist Log: Received a ping to the /verse endpoint.')
 	read_votd()
 	return "ok", 200
 
@@ -127,15 +150,15 @@ def read_news(category): #Detailing top headlines.
 	if(story3 == story1 or story3 == story2):
 		story3 = randint(0, 19)
 
-	story1_description = data.json()['articles'][story1]['description']
-	story2_description = data.json()['articles'][story2]['description']
-	story3_description = data.json()['articles'][story3]['description']
+	story1_title = data.json()['articles'][story1]['title']
+	story2_title = data.json()['articles'][story2]['title']
+	story3_title = data.json()['articles'][story3]['title']
 	story1_url = data.json()['articles'][story1]['url']
 	story2_url = data.json()['articles'][story2]['url']
 	story3_url = data.json()['articles'][story3]['url']
 	better_title = category[0].upper() + category[1:]
 
-	post_message('The Digital Journalist', "Top {} Headlines: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')
+	post_message('The Digital Journalist', "Top {} Headlines: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_title, story1_url, story2_title, story2_url, story3_title, story3_url),'')
 
 def read_history(): #Recalling the events of the past.
 	data = requests.get(
@@ -198,7 +221,7 @@ def read_votd(): #Downloading and uploading verse of tbe day picture.
 	post_message('The Digital Journalist', verse, '')
 
 
-#----------------------------General Methods
+#----------------------------General-use Methods
 def post_message(bot_name, msg, image_url): #Sending a message to the group chat.
 	if image_url == '': #Post message without photo.
 		if bot_name == 'The Talker': #Post message from Talker.

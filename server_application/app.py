@@ -96,19 +96,18 @@ def webhook():
 
 #~~~~~~~~~~~~~~~ Methods.
 def read_weather(): #Explaining the weather forecast.
-	data = requests.get( #get the weather at Oakdale, Minnesota, in Imperial units
+	data = requests.get( #get the weather at Oakdale, Minnesota, in imperial units
 		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
 	)
 	log('The Digital Journalist Log: Received Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 def read_news(catagory): #Detailing top headlines.
-	if catagory != '':
-		 log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
-
-	else:
-		catagory == 'general'
+	if catagory == '':
+		catagory = 'general'
 		log("The Digital Journalist Log: Asking for today's top news.")
+	else:
+		log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
 
 	url_query = 'catagory=' + catagory + '&' #add the url format to custom news request
 	data = requests.get(#get the top thirty US headlines, with an optional custom query

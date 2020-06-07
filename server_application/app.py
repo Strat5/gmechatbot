@@ -106,7 +106,7 @@ def read_news(catagory): #Detailing top headlines.
 	 if catagory != '':
 		 log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
 		
-	else: 
+	else:
 		catagory == 'general'
 		log("The Digital Journalist Log: Asking for today's top news.")
 

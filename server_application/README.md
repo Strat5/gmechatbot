@@ -16,12 +16,12 @@ quotes.txt - A list of motivational quotes need by the bot.
 
 The code is mainly seperated into two functions and likewise two different bots.
 
-"The Journalist" is the chatbot that collects time-specific information. This information can be released by pinging one of it's endpoints.
-"The Talker" is the chatbot that directly interacts and talks with the users. If no users ever send a message, it is entirely useless.
+"The Journalist" is the chatbot that collects time-specific information, like the weather forecast. 
+"The Talker" is the chatbot that directly interacts and talks with the users. 
 
 ## Understanding the code:
 
-The indivdual parts of the code should be clearly explained by the commenting. *If there is a space where this is not the case, please fix it.*
+The indivdual parts of the code should be explained by the commenting. *If there is a space where this is not the case, please fix it.*
 
 There are two special features that the bot incorporates:
 

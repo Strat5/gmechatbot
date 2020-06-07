@@ -103,9 +103,9 @@ def read_weather(): #Explaining the weather forecast.
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 def read_news(catagory): #Detailing top headlines.
-	 if catagory != '':
+	if catagory != '':
 		 log('The Digital Journalist Log: Asking for news about "{}."'.format(catagory))
-		
+
 	else:
 		catagory == 'general'
 		log("The Digital Journalist Log: Asking for today's top news.")

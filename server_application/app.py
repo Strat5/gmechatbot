@@ -37,7 +37,7 @@ def read_quote(): #Reading a quote.
 	post_message('The Talker', quote, '')
 
 def read_joke(): #Telling a joke.
-	x = randint(1, 60)
+	x = randint(1, 61)
 	joke = linecache.getline('jokes.txt', x) #reading a random line in the file
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
@@ -65,7 +65,7 @@ def scan_message(msg): #Using NLP to process the user's message. TODO: Add more 
 			if token.text.lower() != 'news' and token.pos_ != 'ADP':
 				possible_catagories = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology']
 				for i in possible_catagories:
-					if token.text == possible_catagories[i]:
+					if token.text.lower() == i:
 						found_news_catagory = True
 						read_news(token.text)
 						log('The Talker Log: Asking The Journalist for news about {}.'.format(token.text))
@@ -103,7 +103,7 @@ def read_weather(): #Explaining the weather forecast.
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 def read_news(catagory): #Detailing top headlines.
-	if catagory != '':
+	 if catagory != '':
 		log('The Digital Journalist Log: Asking for news about "{}."'.format(query))
 		
 	else: 
@@ -133,6 +133,7 @@ def read_news(catagory): #Detailing top headlines.
 	story1_url = data.json()['articles'][story1]['url']
 	story2_url = data.json()['articles'][story2]['url']
 	story3_url = data.json()['articles'][story3]['url']
+	log('TEST LOG: {}'.format(catagory))
 	better_title = catagory[0].upper() + catagory[1:]
 
 	post_message('The Digital Journalist', "The Today' Top {} News: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, catagorystory1_description, story1_url, story2_description, story2_url, story3_description, story3_url),'')

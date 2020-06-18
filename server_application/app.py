@@ -40,19 +40,19 @@ def webhook():
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
-def read_quote(): #Reading a quote.
+def read_quote():
 	x = randint(1, 80)
 	quote = linecache.getline('quotes.txt', x) #reading a random line in the file
 	log('The Talker Log: Quote has been read.')
 	post_message('The Talker', quote, '')
 
-def read_joke(): #Telling a joke.
+def read_joke():
 	x = randint(1, 61)
 	joke = linecache.getline('jokes.txt', x) #reading a random line in the file
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
 
-def scan_message(msg): #Using NLP to process the user's message. 
+def scan_message(msg):
 	doc = nlp(msg)
 	for token in doc: #iterate over each token (a word or punctuation)
 		#Keywords.
@@ -62,6 +62,8 @@ def scan_message(msg): #Using NLP to process the user's message.
 			read_quote()
 		if token.text.lower()[0:7] == 'weather':
 			read_weather()
+		if token.text.lower()[0:7] == 'holiday':
+			read_holiday()
 		if token.text.lower()[0:4] == 'news':
 			read_news('')
 		if token.text.lower()[0:7] == 'history':
@@ -102,6 +104,11 @@ def webhook():
 	log('The Digital Journalist Log: Received a ping to the /weather endpoint.')
 	read_weather()
 	return "ok", 200
+@app.route('/holiday', endpoint = 'holiday', methods=['POST'])
+def webhook():
+	log('The Digital Journalist Log: Received a ping to the /holiday endpoint.')
+	read_holiday()
+	return "ok", 200
 @app.route('/news', endpoint = 'news', methods=['POST'])
 def webhook():
 	log('The Digital Journalist Log: Received a ping to the /news endpoint.')
@@ -119,14 +126,30 @@ def webhook():
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
-def read_weather(): #Explaining the weather forecast.
+def read_weather():
 	data = requests.get( #get the weather at Oakdale, Minnesota, in imperial units
 		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
 	)
 	log('The Digital Journalist Log: Received Weather. {}'.format(data))
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
-def read_news(category): #Detailing top headlines.
+def read_holiday():
+	month = datetime.date.month
+	day = datetime.date.day
+	data = requests.get(
+    url='https://calendarific.com/api/v2/holidays?api_key={}&country=US&year=2020&month={}&day={}&location=us-mn'.format('2ae71770a8880c5647fe12dd9687420549765425', month, day)
+	)
+	log("The Digital Journalist Log: Received The Holidays. {}".format(data))
+
+	if(len(data.json()['response']['holidays']) == 0):
+		post_message('The Digital Journalist', 'There are no state or national holidays today.', '')
+	else:
+		message = "Today's State and National Holidays Include:"
+		for i in data.json()['response']['holidays']:
+			message = message + '/n/n' + data.json()['response']['holidays'][i]['name'] + '/n' + data.json()['response']['holidays'][i]['description']
+		post_message('The Digital Journalist', message, '')
+
+def read_news(category):
 	if category == '':
 		category = 'general'
 		log("The Digital Journalist Log: Asking for today's top news.")
@@ -160,7 +183,7 @@ def read_news(category): #Detailing top headlines.
 
 	post_message('The Digital Journalist', "Top {} Headlines: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_title, story1_url, story2_title, story2_url, story3_title, story3_url),'')
 
-def read_history(): #Recalling the events of the past.
+def read_history():
 	data = requests.get(
 		url = 'http://history.muffinlabs.com/date'
 		)
@@ -191,7 +214,7 @@ def read_history(): #Recalling the events of the past.
 	date = data.json()['date']
 	post_message('The Digital Journalist', 'Today in History, {}: \n\n{}, {}\n\n{}, {}\n\n{}, {}'.format(date, data.json()['data']['Events'][story1]['year'], data.json()['data']['Events'][story1]['text'], data.json()['data']['Events'][story2]['year'], data.json()['data']['Events'][story2]['text'], data.json()['data']['Events'][story3]['year'], data.json()['data']['Events'][story3]['text']), '')
 
-def read_verse(): #Downloading and uploading verse of tbe day picture.
+def read_verse():
 	dayNumber = (datetime.date.today() - datetime.date(2020, 1, 1)).days
 	data = requests.get( #Request verse and picture url from YouVersion. 
 		url ='https://developers.youversionapi.com/1.0/verse_of_the_day/{}?version_id=1'.format(dayNumber), 

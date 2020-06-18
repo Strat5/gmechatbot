@@ -11,6 +11,7 @@ But the hope is that the final product will be a function (and practical) additi
 	- The verse of the day.
 	- The weather forecast.
 	- This day in history.
+	- Today's state and national holidays.
 	- Today's top news--with an additional feature allowing many news catagories.
 - All of the above features also have an server endpoint attached to them, which any machine can ping to activate their respective functions.
 
@@ -43,14 +44,6 @@ The following guide is only for those who know how to navigate their computer we
 + Step 13: Repeat steps 12 and 13 but with a different name for the second bot, and don't include a callback url.
 + Step 14: Test it in GroupMe! If it doesn't work, try to see if you missed a step. If you can't figure it out, ask a question in Github.
 
-For those who know what they are doing, try setting up cron--or some other alternative--on a server to automatically ping the provided endpoints: 
-	- /joke
-	- /quote
-	- /verse
-	- /weather
-	- /history
-	- /news
-
 ## ⌨️ Usage: 
 
 The Talker (one of the two chatbots) will recognize the following keywords in any message:
@@ -60,6 +53,7 @@ The Talker (one of the two chatbots) will recognize the following keywords in an
 - 'weather'
 - 'history'
 - 'news'
+- 'holiday'
 
 For those who know what they are doing, try setting up cron--or some other alternative--on a server to automatically ping the provided endpoints on a scheduke: 
 - /joke
@@ -68,6 +62,7 @@ For those who know what they are doing, try setting up cron--or some other alter
 - /weather
 - /history
 - /news
+- /holiday
 
 ## 🤝 Contributing:
 
@@ -92,5 +87,6 @@ A big thank you to all these free services!
 - spaCy: Industrial-strength NLP; https://github.com/explosion/spaCy
 - Youversion Verse of the Day API: https://developers.youversion.com
 - WeatherBit API: https://www.weatherbit.io/api
-- Today’s History API: https://history.muffinlabs.com/#api
+- Calendarific: https://calendarific.com/
+- Holiday API: https://holidayapi.com/
 - News API: https://newsapi.org/

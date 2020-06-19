@@ -145,7 +145,7 @@ def read_holiday():
 		post_message('The Digital Journalist', 'There are no state or national holidays today.', '')
 	else:
 		message = "Today's State and National Holidays Include:"
-		for i in data.json()['response']['holidays']:
+		for i in range(len(data.json()['response']['holidays'])):
 			message = message + '/n/n' + data.json()['response']['holidays'][i]['name'] + '/n' + data.json()['response']['holidays'][i]['description']
 		post_message('The Digital Journalist', message, '')
 

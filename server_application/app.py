@@ -16,7 +16,7 @@ import en_core_web_sm
 app = Flask(__name__)
 nlp = en_core_web_sm.load()
 matcher = Matcher(nlp.vocab)
-
+spam_message_count = 0
 
 #----------------------------The Talker----------------------------#
 
@@ -38,17 +38,27 @@ def webhook():
 	log('The Talker Log: Received a ping to the /joke endpoint.')
 	read_joke()
 	return "ok", 200
+@app.route('/spam', endpoint = 'spam', methods=['POST'])
+def webhook():
+	log('The Talker Log: Received a ping to the /spam endpoint.')
+	global spam_message_count
+	spam_message_count += 1 
+	if spam_message_count == 1:
+		post_message('The Talker', 'SPAM HAS BEEN ACTIVATED. Message #1', '')
+	else:
+		post_message('The Talker', 'SPAM Message #{}'.format(spam_message_count), '')
+	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
 def read_quote():
 	x = randint(1, 80)
-	quote = linecache.getline('quotes.txt', x) #reading a random line in the file
+	quote = linecache.getline('quotes.txt', x).rstrip('\n') 
 	log('The Talker Log: Quote has been read.')
 	post_message('The Talker', quote, '')
 
 def read_joke():
 	x = randint(1, 61)
-	joke = linecache.getline('jokes.txt', x) #reading a random line in the file
+	joke = linecache.getline('jokes.txt', x).rstrip('\n') 
 	log('The Talker Log: Joke has been read.')
 	post_message('The Talker', joke, '')
 

@@ -46,7 +46,8 @@ def webhook():
 	if spam_message_count == 1:
 		post_message('The Talker', 'SPAM HAS BEEN ACTIVATED. Message #1', '')
 	else:
-		post_message('The Talker', 'SPAM Message #{}'.format(spam_message_count), '')
+		for i in range(10):
+				post_message('The Talker', 'Counting is hard for me. But {} minutes have passed since messge #1... I think.'.format(spam_message_count), '')
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.

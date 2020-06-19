@@ -134,10 +134,10 @@ def read_weather():
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 def read_holiday():
-	month = datetime.date.month
-	day = datetime.date.day
+	month = datetime.date.today().month
+	day = datetime.date.today().day
 	data = requests.get(
-    url='https://calendarific.com/api/v2/holidays?api_key={}&country=US&year=2020&month={}&day={}&location=us-mn'.format('2ae71770a8880c5647fe12dd9687420549765425', month, day)
+    url='https://calendarific.com/api/v2/holidays?api_key={}&country=US&year=2020&month={}&day={}&location=us-mn'.format(os.getenv('CALENDARIFIC_API_KEY'), month, day)
 	)
 	log("The Digital Journalist Log: Received The Holidays. {}".format(data))
 

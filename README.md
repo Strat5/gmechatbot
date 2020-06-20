@@ -46,7 +46,7 @@ The following guide is only for those who know how to navigate their computer we
 
 ## ⌨️ Usage: 
 
-The Talker (one of the two chatbots) will recognize the following keywords in any message:
+The Talker (one of the two chatbots) will recieve the messages and recognize the following keywords in any message:
 - 'joke'
 - 'quote'
 - 'verse'
@@ -55,14 +55,11 @@ The Talker (one of the two chatbots) will recognize the following keywords in an
 - 'news'
 - 'holiday'
 
-For those who know what they are doing, try setting up cron--or some other alternative--on a server to automatically ping the provided endpoints on a scheduke: 
-- /joke
-- /quote
-- /verse
-- /weather
-- /history
-- /news
-- /holiday
+If the desired function has something to do with research (weather, history, news, etc) then the Digital Journalist bot will send the reply instead of the talker. 
+
+For those who know what they are doing, try setting up cron--or some other alternative--on a server to automatically ping the provided endpoints on a schedule. The endpoints are identitical to the keywords; for example, 00 12 * * * curl -X POST https://my-heroku-app-name.herokuapp.com/joke would equate to a joke being posted in the groupchat every noon. 
+
+Learn more about cron [here](https://www.digitalocean.com/community/tutorials/how-to-use-cron-to-automate-tasks-ubuntu-1804).
 
 ## 🤝 Contributing:
 
@@ -76,7 +73,7 @@ If you are new to Github and want to contribute try reading these tutorials:
 - Here is a tutorial to Git and Github: https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners.
 - More specifically, here is how you can contribute: https://guides.github.com/activities/forking/.
 
-*Please see the contributing.md file for more info.*
+[*Please see the contributing.md file for more info.*](CONTRIBUTING.md)
 
 ## 👍 Acknowledgements:
 

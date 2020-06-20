@@ -1,4 +1,4 @@
-#~~~~~~~~~~~~~~~ Package imports.
+import CONFIG as config
 import os
 import sys
 import json
@@ -16,15 +16,15 @@ import en_core_web_sm
 app = Flask(__name__)
 nlp = en_core_web_sm.load()
 matcher = Matcher(nlp.vocab)
-spam_message_count = 0
+
 
 #----------------------------The Talker----------------------------#
 
-#~~~~~~~~~~~~~~~ Endpoints.
-@app.route('/', methods=['POST']) 
+#~~~~~~~~~~~~~~~Server Endpoints.
+@app.route('/', methods=['POST'])	#messages from GroupMe chats land here
 def webhook():				
 	data = request.get_json()
-	if data['sender_type'] == 'user': #did the user send the message?
+	if data['sender_type'] == 'user':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 		scan_message(data['text'])
 	return "ok", 200
@@ -37,17 +37,6 @@ def webhook():
 def webhook():
 	log('The Talker Log: Received a ping to the /joke endpoint.')
 	read_joke()
-	return "ok", 200
-@app.route('/spam', endpoint = 'spam', methods=['POST'])
-def webhook():
-	log('The Talker Log: Received a ping to the /spam endpoint.')
-	global spam_message_count
-	spam_message_count += 1 
-	if spam_message_count == 1:
-		post_message('The Talker', 'SPAM HAS BEEN ACTIVATED. Message #1', '')
-	else:
-		for i in range(10):
-				post_message('The Talker', 'Counting is hard for me. But {} minutes have passed since messge #1... I think.'.format(spam_message_count), '')
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
@@ -64,36 +53,33 @@ def read_joke():
 	post_message('The Talker', joke, '')
 
 def scan_message(msg):
-	doc = nlp(msg)
-	for token in doc: #iterate over each token (a word or punctuation)
-		#Keywords.
-		if token.text.lower()[0:4] == 'joke':
+	doc = nlp(msg) 								#transform the user's message into a spacy doc object
+	for token in doc: 							#iterate over each token (a word or punctuation)
+		if token.text.lower()[0:4] == 'joke' and config.read_joke == 'True':
 			read_joke()
-		if token.text.lower()[0:5] == 'quote':
+		if token.text.lower()[0:5] == 'quote' and config.read_quote == 'True':
 			read_quote()
-		if token.text.lower()[0:7] == 'weather':
-			read_weather()
-		if token.text.lower()[0:7] == 'holiday':
-			read_holiday()
-		if token.text.lower()[0:4] == 'news':
-			read_news('')
-		if token.text.lower()[0:7] == 'history':
-			read_history()
-		if token.text.lower()[0:5] == 'verse':
+		if token.text.lower()[0:5] == 'verse' and config.read_verse == 'True':
 			read_verse()
+		if token.text.lower()[0:7] == 'weather' and config.read_weather == 'True':
+			read_weather()
+		if token.text.lower()[0:7] == 'holiday' and config.read_holiday == 'True':
+			read_holiday()
+		if token.text.lower()[0:7] == 'history' and config.read_history == 'True':
+			read_history()
 
-	#Spacy matching patterns for custom news 
+	#Spacy matching patterns for news catagories.
 	matcher.add("CUSTOM_NEWS_PATTERN1", None, [{"POS":"NOUN"}, {"LOWER":"news"}])   
 	matcher.add("CUSTOM_NEWS_PATTERN2", None, [{'LOWER': 'news'}, {'POS': 'ADP'}, {'POS': 'NOUN'}])
 	matcher.add("CUSTOM_NEWS_PATTERN3", None, [{"POS":"PROPN"}, {"LOWER":"news"}])   
 	matcher.add("CUSTOM_NEWS_PATTERN4", None, [{'LOWER': 'news'}, {'POS': 'ADP'}, {'POS': 'PROPN'}])
-	matches = matcher(doc)
+	matches = matcher(doc) 
 
-	# Iterate over the matches and tokens to find the category
+	#Iterate over the matches and then the tokens in the matches to find the  newscategory(ies).
 	found_news_category = False
 	for match_id, start, end in matches:
 		for token in doc[start:end]:
-			if token.text.lower() != 'news' and token.pos_ != 'ADP':
+			if token.text.lower() != 'news' and token.pos_ != 'ADP'and config.read_news == 'True':
 				possible_catagories = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology']
 				for i in possible_catagories:
 					if token.text.lower() == i:
@@ -138,7 +124,7 @@ def webhook():
 
 #~~~~~~~~~~~~~~~ Methods.
 def read_weather():
-	data = requests.get( #get the weather at Oakdale, Minnesota, in imperial units
+	data = requests.get( 
 		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
 	)
 	log('The Digital Journalist Log: Received Weather. {}'.format(data))
@@ -167,8 +153,8 @@ def read_news(category):
 	else:
 		log('The Digital Journalist Log: Asking for news about "{}."'.format(category))
 
-	url_category = 'category=' + category + '&' #add the url format to custom news request
-	data = requests.get(#get the top twenty US headlines, with an optional custom query
+	url_category = 'category=' + category + '&'		#add the url query format to custom news request
+	data = requests.get(	#get the top twenty US headlines, with an optional custom query
 		url = 'http://newsapi.org/v2/top-headlines?country=us&{}apiKey={}'.format(url_category, os.getenv('NEWS_API_KEY'))
 	)
 	log("The Digital Journalist Log: Received The News. {}".format(data))
@@ -249,16 +235,15 @@ def read_verse():
 	)
 	log('The Digital Journalist Log: Image Upload to GroupMe Complete. {}'.format(data))
 
-	#Post the image to the chat.
 	image_url = (data.json()['payload']['url'])
 	post_message('The Digital Journalist', '', image_url)
 	post_message('The Digital Journalist', verse, '')
 
 
 #----------------------------General-use Methods
-def post_message(bot_name, msg, image_url): #Sending a message to the group chat.
+def post_message(bot_name, msg, image_url): 
 	if image_url == '': #Post message without photo.
-		if bot_name == 'The Talker': #Post message from Talker.
+		if bot_name == 'The Talker': 
 			data = requests.post(
 				url = 'https://api.groupme.com/v3/bots/post', 
 				data = {
@@ -277,7 +262,7 @@ def post_message(bot_name, msg, image_url): #Sending a message to the group chat
 			)
 			log('The Digital Journalist Log: Message: "{}" was posted. {}'.format(msg, data))
 	else: #Post message with photo.
-		if bot_name == 'The Talker': #Post message from The Talker.
+		if bot_name == 'The Talker': 
 			data = requests.post(
 				url = 'https://api.groupme.com/v3/bots/post', 
 				params = {
@@ -296,7 +281,7 @@ def post_message(bot_name, msg, image_url): #Sending a message to the group chat
 				}
 			)
 			log('The Talker Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
-		elif bot_name == 'The Digital Journalist': #Post message from The Digital Journalist.
+		elif bot_name == 'The Digital Journalist': 
 			data = requests.post(
 				url = 'https://api.groupme.com/v3/bots/post', 
 				params = {
@@ -316,6 +301,6 @@ def post_message(bot_name, msg, image_url): #Sending a message to the group chat
 			)
 			log('The Digital Journalist Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
 
-def log(msg): #Printing log information.
+def log(msg): 
 	print(str(msg))
 	sys.stdout.flush()

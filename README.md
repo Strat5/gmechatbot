@@ -16,9 +16,9 @@ But the hope is that the final product will be a function (and practical) additi
 - All of the above features also have an server endpoint attached to them, which any machine can ping to activate their respective functions.
 
 ## 🔨 Installation: 
-This is the recommended and tested setup, feel free to switch out server hosting providers, for example, but we can not guarantee any results. Contact us with any questions!
+This is the recommended and tested setup, feel free to switch out server hosting providers, for example, but this is the only tested method. Feel free to ask questions!
 
-The following guide is only for those who know how to navigate their computer well; a more complex guide will come out soon.
+The following guide is only for those who know how to navigate their computer well; a better guide will come out soon.
 + Step 1: Install Git from here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git.
 + Step 2: Install Heroku CLI from here: https://devcenter.heroku.com/articles/heroku-cli.
 + Step 3: Go to heroku.com and signup (or log in).
@@ -74,16 +74,16 @@ To start, try adding a new joke or motovational quote to the bot.
 If you are new to Github and want to contribute try reading these tutorials:
 
 - Here is a tutorial to Git and Github: https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners.
-- More specifically, here is how you can edit my project: https://guides.github.com/activities/forking/.
+- More specifically, here is how you can contribute: https://guides.github.com/activities/forking/.
 
 *Please see the contributing.md file for more info.*
 
 ## 👍 Acknowledgements:
+
 Thank you to this article which got this project started!
 http://www.apnorton.com/blog/2017/02/28/How-I-wrote-a-Groupme-Chatbot-in-24-hours/
 
 A big thank you to all these free services!
-
 - spaCy: Industrial-strength NLP; https://github.com/explosion/spaCy
 - Youversion Verse of the Day API: https://developers.youversion.com
 - WeatherBit API: https://www.weatherbit.io/api

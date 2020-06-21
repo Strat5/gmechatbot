@@ -14,6 +14,7 @@ But the hope is that the final product will be a function (and practical) additi
 	- Today's state and national holidays.
 	- Today's top news--with an additional feature allowing many news catagories.
 - All of the above features also have an server endpoint attached to them, which any machine can ping to activate their respective functions.
+- Customization features.
 
 ## 🔨 Installation (as of the last offical version): 
 

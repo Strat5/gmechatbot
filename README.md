@@ -3,9 +3,9 @@
 The primary purpose of this project is to learn about and have fun while creating a chatbot. 
 But the hope is that the final product will be a function (and practical) addition to any GroupMe groupchat.
 
-## 🗒 Features (as of the last offical version):
+## 🗒 Features:
 	
-- Using keywords, the bots (there are two programmed into one app, each with different functions) recognize requests for the following information:
+- Using keywords in the chat messages, the bots recognize requests for the following information:
 	- A joke.
 	- A (motivational) quote.
 	- The verse of the day.
@@ -13,10 +13,11 @@ But the hope is that the final product will be a function (and practical) additi
 	- This day in history.
 	- Today's state and national holidays.
 	- Today's top news--with an additional feature allowing many news catagories.
+- All of the above features can be turned off individually.
 - All of the above features also have an server endpoint attached to them, which any machine can ping to activate their respective functions.
 - Customization features.
 
-## 🔨 Installation (as of the last offical version): 
+## 🔨 Installation: 
 
 *IMPORTANT: THIS GUIDE IS INCORRECT. It will soon be replaced, but if you would still like to try it, you need to sign up for all the APIs and add the enviroment variables in the Heroku setup.*
 
@@ -51,7 +52,7 @@ The following guide is only for those who know how to navigate their computer we
 
 ## ⌨️ Usage: 
 
-The Talker (one of the two chatbots) will recieve the messages and recognize the following keywords in any message:
+The Talker (one of two chatbots) will recieve the messages and recognize the following keywords in any message:
 - 'joke'
 - 'quote'
 - 'verse'
@@ -60,7 +61,7 @@ The Talker (one of the two chatbots) will recieve the messages and recognize the
 - 'news'
 - 'holiday'
 
-If the desired function has something to do with research (weather, history, news, etc) then the Digital Journalist bot will send the reply instead of the talker. 
+If the desired function has something to do with research (weather, history, news, etc) then the Digital Journalist bot will send the reply instead of The Talker. 
 
 For those who know what they are doing, try setting up cron--or some other alternative--on a server to automatically ping the provided endpoints on a schedule. The endpoints are identitical to the keywords; for example, 00 12 * * * curl -X POST https://my-heroku-app-name.herokuapp.com/joke would equate to a joke being posted in the groupchat every noon. 
 

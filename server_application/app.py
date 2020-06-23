@@ -112,7 +112,7 @@ def analyze_chat():
 			break
 		else:
 			oldest_index = data.json()['response']['messages'][99]['id'] 	
-	post_message('There are {} messages in the selected groupchat.'.format(len(group_messages)))
+	post_message('The Talker', 'There are {} messages in the selected groupchat.'.format(len(group_messages)), '')
 
 	people = set()
 	for i in range(len(groupchat_messages)): 								#iterate initally to create a set of every person in the chat

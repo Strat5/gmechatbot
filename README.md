@@ -4,10 +4,10 @@ The primary purpose of this project is to learn about and have fun while creatin
 But the hope is that the final product will be a function (and practical) addition to any GroupMe groupchat.
 
 ## 🗒 Features:
-	
 - Using keywords in the chat messages, the bots recognize requests for the following information:
 	- A joke.
 	- A (motivational) quote.
+	- An analysis of the groupchat messages.
 	- The verse of the day.
 	- The weather forecast.
 	- This day in history.
@@ -15,7 +15,6 @@ But the hope is that the final product will be a function (and practical) additi
 	- Today's top news--with an additional feature allowing many news catagories.
 - All of the above features can be turned off individually.
 - All of the above features also have an server endpoint attached to them, which any machine can ping to activate their respective functions.
-- Customization features.
 
 ## 🔨 Installation: 
 
@@ -55,6 +54,7 @@ The following guide is only for those who know how to navigate their computer we
 The Talker (one of two chatbots) will recieve the messages and recognize the following keywords in any message:
 - 'joke'
 - 'quote'
+- 'analyze'
 - 'verse'
 - 'weather'
 - 'history'

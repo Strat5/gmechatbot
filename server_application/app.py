@@ -53,7 +53,7 @@ def scan_message(msg):
 		if token.text.lower()[0:5] == 'quote' and config.read_quote == True:
 			read_quote()
 		if token.text.lower()[0:7] == 'analyze' and config.read_analyze == True:
-			read_analyze()
+			analyze_chat()
 		if token.text.lower()[0:5] == 'verse' and config.read_verse == True:
 			read_verse()
 		if token.text.lower()[0:7] == 'weather' and config.read_weather == True:
@@ -101,36 +101,34 @@ def read_joke():
 
 def analyze_chat():
 	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
-	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.genenv('GROUPME_DEVELOPER_TOKEN')))
+	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.getenv('GROUPME_DEVELOPER_TOKEN')))
 	print(data.json())
 	group_messages = data.json()['response']['messages']
-	oldest_index = data.json()['response']['messages'][99]['id']  			# get the oldest message index in this group
+	oldest_index = data.json()['response']['messages'][99]['id']  			# get the oldest message index in this group (to request the messages before that one)
 	while True: 															#loop to request all the responses
 		data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&before_id={}&token={}'.format(os.getenv('GROUPCHAT_ID'), oldest_index, os.genev('GROUPME_DEVELOPER_TOKEN')))
 		group_messages = group_messages + data.json()['response']['messages']
 		if len(data.json()['response']['messages']) < 100:					#if the last request was not completely full, break out of the loop
 			break
 		else:
-			oldest_index = data.json()['response']['messages'][99]['id'] 	# get the oldest message index in this group
+			oldest_index = data.json()['response']['messages'][99]['id'] 	
 	post_message('There are {} messages in the selected groupchat.'.format(len(group_messages)))
 
 	people = set()
 	for i in range(len(groupchat_messages)): 								#iterate initally to create a set of every person in the chat
 		people.add(groupchat_messages[i]['name'])
-
 	people = list(people)
 	people_data = {}		
-	for i in range(len(people)):											#assign each person a total message count
+	for i in range(len(people)):											#assign each person a dictionary 
 		people_data = people_data + {people[i] : {messages_sent : 0}}
-
-	for i in range(len(groupchat_messages)): 								#iterate to collect data
+	for i in range(len(groupchat_messages)): 								#iterate to fill dictionaries
 		people_data['name']['messages_sent'] += 1
 
-	msg = 'Per person: \n'													
+	msg = 'Per person: \n'													#create message summarizing data				
 	for i in range(len(people)):
 		msg = msg + '{} sent {} messages.'.format(people[i], people_data[people[i]]['messages_sent'])
-
 	post_message('The Talker', msg, '')
+
 
 #----------------------------The Digital Journalist----------------------------#
 

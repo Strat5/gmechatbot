@@ -38,34 +38,27 @@ def webhook():
 	log('The Talker Log: Received a ping to the /joke endpoint.')
 	read_joke()
 	return "ok", 200
+@app.route('/analyze', endpoint = 'analyze', methods=['POST'])
+def webhook():
+	log('The Talker Log: Received a ping to the /analyze endpoint.')
+	analyze_chat()
+	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
-def read_quote():
-	x = randint(1, 80)
-	quote = linecache.getline('quotes.txt', x).rstrip('\n') 
-	log('The Talker Log: Quote has been read.')
-	post_message('The Talker', quote, '')
-
-def read_joke():
-	x = randint(1, 61)
-	joke = linecache.getline('jokes.txt', x).rstrip('\n') 
-	log('The Talker Log: Joke has been read.')
-	post_message('The Talker', joke, '')
-
 def scan_message(msg):
 	doc = nlp(msg) 								#transform the user's message into a spacy doc object
 	for token in doc: 							#iterate over each token (a word or punctuation)
-		if token.text.lower()[0:4] == 'joke' and config.read_joke == 'True':
+		if token.text.lower()[0:4] == 'joke' and config.read_joke == True:
 			read_joke()
-		if token.text.lower()[0:5] == 'quote' and config.read_quote == 'True':
+		if token.text.lower()[0:5] == 'quote' and config.read_quote == True:
 			read_quote()
-		if token.text.lower()[0:5] == 'verse' and config.read_verse == 'True':
+		if token.text.lower()[0:5] == 'verse' and config.read_verse == True:
 			read_verse()
-		if token.text.lower()[0:7] == 'weather' and config.read_weather == 'True':
+		if token.text.lower()[0:7] == 'weather' and config.read_weather == True:
 			read_weather()
-		if token.text.lower()[0:7] == 'holiday' and config.read_holiday == 'True':
+		if token.text.lower()[0:7] == 'holiday' and config.read_holiday == True:
 			read_holiday()
-		if token.text.lower()[0:7] == 'history' and config.read_history == 'True':
+		if token.text.lower()[0:7] == 'history' and config.read_history == True:
 			read_history()
 
 	#Spacy matching patterns for news catagories.
@@ -79,7 +72,7 @@ def scan_message(msg):
 	found_news_category = False
 	for match_id, start, end in matches:
 		for token in doc[start:end]:
-			if token.text.lower() != 'news' and token.pos_ != 'ADP'and config.read_news == 'True':
+			if token.text.lower() != 'news' and token.pos_ != 'ADP'and config.read_news == True:
 				possible_catagories = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology']
 				for i in possible_catagories:
 					if token.text.lower() == i:
@@ -91,6 +84,33 @@ def scan_message(msg):
 				if found_news_category == False:
 					log('The Talker Log: Received an unacceptable news request.')
 					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, or technology.", '')
+
+def read_quote():
+	x = randint(1, 80)
+	quote = linecache.getline('quotes.txt', x).rstrip('\n') 
+	log('The Talker Log: Quote has been read.')
+	post_message('The Talker', quote, '')
+
+def read_joke():
+	x = randint(1, 61)
+	joke = linecache.getline('jokes.txt', x).rstrip('\n') 
+	log('The Talker Log: Joke has been read.')
+	post_message('The Talker', joke, '')
+
+def analyze_chat():
+	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
+	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}').format(os.getenv('GROUPCHAT_ID', os.genev('GROUPME_DEVELOPER_TOKEN')))
+	print(data.json())
+	group_messages = data.json()['response']['messages']
+	oldest_index = data.json()['response']['messages'][99]['id']  			# get the oldest message index in this group
+	while True: 															#loop to request all the responses
+		data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&before_id={}&token={}'.format(os.getenv('GROUPCHAT_ID'), oldest_index, os.genev('GROUPME_DEVELOPER_TOKEN')))
+		group_messages = group_messages + data.json()['response']['messages']
+		if len(data.json()['response']['messages']) < 100:					#if the last request was not completely full, break out of the loop
+			break
+		else:
+			oldest_index = data.json()['response']['messages'][99]['id'] 	# get the oldest message index in this group
+	post_message('There are {} messages in the selected groupchat.'.format(len(group_messages)))
 
 
 #----------------------------The Digital Journalist----------------------------#

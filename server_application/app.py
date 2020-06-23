@@ -120,12 +120,12 @@ def analyze_chat():
 	people = list(people)
 	people_data = {}		
 	for i in range(len(people)):											#assign each person a dictionary 
-		people_data = people_data + {people[i] : {messages_sent : 0}}
+		people_data = people_data + {people[i] : {'messages_sent' : 0}}
 	for i in range(len(group_messages)): 									#iterate to fill dictionaries
 		people_data['name']['messages_sent'] += 1
 	msg = 'Per person: \n'			
 	for i in range(len(people)): 											#create message summarizing data
-		msg = msg + '{} sent {} messages.'.format(people[i], people_data[people[i]]['messages_sent'])
+		msg = msg + '{} sent {} messages. \n'.format(people[i], people_data[people[i]]['messages_sent'])
 	post_message('The Talker', msg, '')
 
 

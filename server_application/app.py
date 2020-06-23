@@ -1,4 +1,4 @@
-import CONFIG as config
+import config
 import os
 import sys
 import json

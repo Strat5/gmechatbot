@@ -106,7 +106,7 @@ def analyze_chat():
 	group_messages = data.json()['response']['messages']
 	oldest_index = data.json()['response']['messages'][99]['id']  			# get the oldest message index in this group (to request the messages before that one)
 	while True: 															#loop to request all the responses
-		data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&before_id={}&token={}'.format(os.getenv('GROUPCHAT_ID'), oldest_index, os.genev('GROUPME_DEVELOPER_TOKEN')))
+		data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&before_id={}&token={}'.format(os.getenv('GROUPCHAT_ID'), oldest_index, os.getenv('GROUPME_DEVELOPER_TOKEN')))
 		group_messages = group_messages + data.json()['response']['messages']
 		if len(data.json()['response']['messages']) < 100:					#if the last request was not completely full, break out of the loop
 			break
@@ -123,7 +123,6 @@ def analyze_chat():
 		people_data = people_data + {people[i] : {messages_sent : 0}}
 	for i in range(len(groupchat_messages)): 								#iterate to fill dictionaries
 		people_data['name']['messages_sent'] += 1
-
 	msg = 'Per person: \n'													#create message summarizing data				
 	for i in range(len(people)):
 		msg = msg + '{} sent {} messages.'.format(people[i], people_data[people[i]]['messages_sent'])

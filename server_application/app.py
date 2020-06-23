@@ -115,16 +115,16 @@ def analyze_chat():
 	post_message('The Talker', 'There are {} messages in the selected groupchat.'.format(len(group_messages)), '')
 
 	people = set()
-	for i in range(len(groupchat_messages)): 								#iterate initally to create a set of every person in the chat
-		people.add(groupchat_messages[i]['name'])
+	for i in range(len(group_messages)): 									#iterate initally to create a set of every person in the chat
+		people.add(group_messages[i]['name'])
 	people = list(people)
 	people_data = {}		
 	for i in range(len(people)):											#assign each person a dictionary 
 		people_data = people_data + {people[i] : {messages_sent : 0}}
-	for i in range(len(groupchat_messages)): 								#iterate to fill dictionaries
+	for i in range(len(group_messages)): 									#iterate to fill dictionaries
 		people_data['name']['messages_sent'] += 1
-	msg = 'Per person: \n'													#create message summarizing data				
-	for i in range(len(people)):
+	msg = 'Per person: \n'			
+	for i in range(len(people)): 											#create message summarizing data
 		msg = msg + '{} sent {} messages.'.format(people[i], people_data[people[i]]['messages_sent'])
 	post_message('The Talker', msg, '')
 

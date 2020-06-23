@@ -53,7 +53,7 @@ def scan_message(msg):
 		if token.text.lower()[0:5] == 'quote' and config.read_quote == True:
 			read_quote()
 		if token.text.lower()[0:7] == 'analyze' and config.read_analyze == True:
-			read_quote()
+			read_analyze()
 		if token.text.lower()[0:5] == 'verse' and config.read_verse == True:
 			read_verse()
 		if token.text.lower()[0:7] == 'weather' and config.read_weather == True:
@@ -101,7 +101,7 @@ def read_joke():
 
 def analyze_chat():
 	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
-	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.genev('GROUPME_DEVELOPER_TOKEN')))
+	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.genenv('GROUPME_DEVELOPER_TOKEN')))
 	print(data.json())
 	group_messages = data.json()['response']['messages']
 	oldest_index = data.json()['response']['messages'][99]['id']  			# get the oldest message index in this group

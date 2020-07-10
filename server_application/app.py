@@ -46,8 +46,8 @@ def webhook():
 
 #~~~~~~~~~~~~~~~ Methods.
 def scan_message(msg):
-	doc = nlp(msg) 								#transform the user's message into a spacy doc object
-	for token in doc: 							#iterate over each token (a word or punctuation)
+	doc = nlp(msg) 															#transform the user's message into a spacy doc object
+	for token in doc: 														#iterate over each token (a word or punctuation)
 		if token.text.lower()[0:4] == 'joke' and config.read_joke == True:
 			read_joke()
 		if token.text.lower()[0:5] == 'quote' and config.read_quote == True:
@@ -70,7 +70,7 @@ def scan_message(msg):
 	matcher.add("CUSTOM_NEWS_PATTERN4", None, [{'LOWER': 'news'}, {'POS': 'ADP'}, {'POS': 'PROPN'}])
 	matches = matcher(doc) 
 
-	#Iterate over the matches and then the tokens in the matches to find the  newscategory(ies).
+	#Iterate over the matches and then the tokens in the matches to find the news category(ies).
 	found_news_category = False
 	for match_id, start, end in matches:
 		for token in doc[start:end]:
@@ -102,30 +102,39 @@ def read_joke():
 def analyze_chat():
 	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
 	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.getenv('GROUPME_DEVELOPER_TOKEN')))
-	print(data.json())
 	group_messages = data.json()['response']['messages']
 	oldest_index = data.json()['response']['messages'][99]['id']  			# get the oldest message index in this group (to request the messages before that one)
-	while True: 															#loop to request all the responses
+	while True: 															#loop to request all the messages
 		data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&before_id={}&token={}'.format(os.getenv('GROUPCHAT_ID'), oldest_index, os.getenv('GROUPME_DEVELOPER_TOKEN')))
 		group_messages = group_messages + data.json()['response']['messages']
-		if len(data.json()['response']['messages']) < 100:					#if the last request was not completely full, break out of the loop
+		if len(data.json()['response']['messages']) < 100:					#if the last request was not completely full, all the messages have been collected
 			break
 		else:
-			oldest_index = data.json()['response']['messages'][99]['id'] 	
-	post_message('The Talker', 'There are {} messages in the selected groupchat.'.format(len(group_messages)), '')
+			oldest_index = data.json()['response']['messages'][99]['id']
+	
+	entities = set()
+	for i in range(len(group_messages)): 									#find every person who has ever sent a message in the groupchat
+		entities.add(group_messages[i]['name'])
+	entities = list(entities)
+	entity_data = {}
+	for i in range(len(entities)):											#assign each person as a index in a dictionary
+		entity_data[entities[i]] = {'messages_sent' : 0}
+	for i in range(len(group_messages)): 									#iterate over each message to fill personal dictionaries
+		entity_data[group_messages[i]['name']]['messages_sent'] += 1
 
-	people = set()
-	for i in range(len(group_messages)): 									#iterate initally to create a set of every person in the chat
-		people.add(group_messages[i]['name'])
-	people = list(people)
-	people_data = {}		
-	for i in range(len(people)):											#assign each person a dictionary 
-		people_data = people_data + {people[i] : {'messages_sent' : 0}}
-	for i in range(len(group_messages)): 									#iterate to fill dictionaries
-		people_data['name']['messages_sent'] += 1
-	msg = 'Per person: \n'			
-	for i in range(len(people)): 											#create message summarizing data
-		msg = msg + '{} sent {} messages. \n'.format(people[i], people_data[people[i]]['messages_sent'])
+	most_messages_person = entities[0]
+	second_most_messages_person = entities[0]
+	third_most_messages_person = entities[0]
+	for i in range(len(entities)):
+		if entity_data[entities[i]]['messages_sent'] > entity_data[most_messages_person]['messages_sent']:
+			most_messages_person = entities[i]
+	for i in range(len(entities)):
+		if entity_data[entities[i]]['messages_sent'] > entity_data[second_most_messages_person]['messages_sent'] and entities[i] != most_messages_person:
+			second_most_messages_person = entities[i]
+	for i in range(len(entities)):
+		if entity_data[entities[i]]['messages_sent'] > entity_data[third_most_messages_person]['messages_sent'] and entities[i] != most_messages_person and entities[i] != second_most_messages_person :
+			third_most_messages_person = entities[i]
+	msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Three Contributers:\t\n{} with {} messages.\t\n{} with {} messages.\t\n{} with {} messages '.format(len(group_messages) - entity_data['GroupMe']['messages_sent'], most_messages_person, entity_data[most_messages_person]['messages_sent'], second_most_messages_person, entity_data[second_most_messages_person]['messages_sent'], third_most_messages_person, entity_data[third_most_messages_person]['messages_sent'])
 	post_message('The Talker', msg, '')
 
 

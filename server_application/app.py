@@ -112,29 +112,31 @@ def analyze_chat():
 		else:
 			oldest_index = data.json()['response']['messages'][99]['id']
 	
-	entities = set()
+entity = set()
 	for i in range(len(group_messages)): 									#find every person who has ever sent a message in the groupchat
-		entities.add(group_messages[i]['name'])
-	entities = list(entities)
+		entity.add(group_messages[i]['name'])
+	entity = sorted(list(entity))
+	entity.append('FAKE ENTITY')
 	entity_data = {}
-	for i in range(len(entities)):											#assign each person as a index in a dictionary
-		entity_data[entities[i]] = {'messages_sent' : 0}
+	for i in range(len(entity)):											#assign each person as a index in a dictionary
+		entity_data[entity[i]] = {'messages_sent' : 0, 'contribution_percent' : 0}
 	for i in range(len(group_messages)): 									#iterate over each message to fill personal dictionaries
 		entity_data[group_messages[i]['name']]['messages_sent'] += 1
+	total_human_messages = len(group_messages) - entity_data['GroupMe']['messages_sent']
+	for i in range(len(entity)):											#iterate over each person to do calculations
+		entity_data[entity[i]]['contribution_percent'] = round(entity_data[entity[i]]['messages_sent'] / total_human_messages * 100)
 
-	most_messages_person = entities[0]
-	second_most_messages_person = entities[0]
-	third_most_messages_person = entities[0]
-	for i in range(len(entities)):
-		if entity_data[entities[i]]['messages_sent'] > entity_data[most_messages_person]['messages_sent']:
-			most_messages_person = entities[i]
-	for i in range(len(entities)):
-		if entity_data[entities[i]]['messages_sent'] > entity_data[second_most_messages_person]['messages_sent'] and entities[i] != most_messages_person:
-			second_most_messages_person = entities[i]
-	for i in range(len(entities)):
-		if entity_data[entities[i]]['messages_sent'] > entity_data[third_most_messages_person]['messages_sent'] and entities[i] != most_messages_person and entities[i] != second_most_messages_person :
-			third_most_messages_person = entities[i]
-	msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Three Contributers:\t\n{} with {} messages.\t\n{} with {} messages.\t\n{} with {} messages '.format(len(group_messages) - entity_data['GroupMe']['messages_sent'], most_messages_person, entity_data[most_messages_person]['messages_sent'], second_most_messages_person, entity_data[second_most_messages_person]['messages_sent'], third_most_messages_person, entity_data[third_most_messages_person]['messages_sent'])
+	chatty_people = [entity[len(entity)-1], entity[len(entity)-1], entity[len(entity)-1], entity[len(entity)-1], entity[len(entity)-1], entity[len(entity)-1], entity[len(entity)-1]]
+	for i in range(7):
+		if i != 0:
+			for j in range(len(entity)):
+				if entity_data[entity[j]]['messages_sent'] > entity_data[chatty_people[i]]['messages_sent'] and entity_data[entity[j]]['messages_sent'] < entity_data[chatty_people[i-1]]['messages_sent']:
+					chatty_people[i] = entity[j]
+		else:
+			for j in range(len(entity)):
+				if entity_data[entity[j]]['messages_sent'] > entity_data[chatty_people[i]]['messages_sent']:
+					chatty_people[i] = entity[j]
+	msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Seven Contributers:\t\n{} with {} messages. ({}%)\t\n{} with {} messages. ({}%)\t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%)'.format(total_human_messages, chatty_people[0], entity_data[chatty_people[0]]['messages_sent'], entity_data[chatty_people[0]]['contribution_percent'], chatty_people[1], entity_data[chatty_people[1]]['messages_sent'], entity_data[chatty_people[1]]['contribution_percent'], chatty_people[2], entity_data[chatty_people[2]]['messages_sent'], entity_data[chatty_people[2]]['contribution_percent'], chatty_people[3], entity_data[chatty_people[3]]['messages_sent'], entity_data[chatty_people[3]]['contribution_percent'], chatty_people[4], entity_data[chatty_people[4]]['messages_sent'], entity_data[chatty_people[4]]['contribution_percent'], chatty_people[5], entity_data[chatty_people[5]]['messages_sent'], entity_data[chatty_people[5]]['contribution_percent'], chatty_people[6], entity_data[chatty_people[6]]['messages_sent'], entity_data[chatty_people[6]]['contribution_percent'])
 	post_message('The Talker', msg, '')
 
 

@@ -112,7 +112,7 @@ def analyze_chat():
 		else:
 			oldest_index = data.json()['response']['messages'][99]['id']
 	
-entity = set()
+	entity = set()
 	for i in range(len(group_messages)): 									#find every person who has ever sent a message in the groupchat
 		entity.add(group_messages[i]['name'])
 	entity = sorted(list(entity))

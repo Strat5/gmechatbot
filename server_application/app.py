@@ -119,9 +119,10 @@ def analyze_chat():
 	entity.append('FAKE ENTITY')
 	entity_data = {}
 	for i in range(len(entity)):											#assign each person as a index in a dictionary
-		entity_data[entity[i]] = {'messages_sent' : 0, 'contribution_percent' : 0}
+		entity_data[entity[i]] = {'messages_sent' : 0, 'likes_collected' : 0, 'contribution_percent' : 0}
 	for i in range(len(group_messages)): 									#iterate over each message to fill personal dictionaries
 		entity_data[group_messages[i]['name']]['messages_sent'] += 1
+		entity_data[group_messages[i]['name']]['likes_collected'] += len(group_messages[i]["favorited_by"])
 	total_human_messages = len(group_messages) - entity_data['GroupMe']['messages_sent']
 	for i in range(len(entity)):											#iterate over each person to do calculations
 		entity_data[entity[i]]['contribution_percent'] = round(entity_data[entity[i]]['messages_sent'] / total_human_messages * 100)
@@ -136,7 +137,7 @@ def analyze_chat():
 			for j in range(len(entity)):
 				if entity_data[entity[j]]['messages_sent'] > entity_data[chatty_people[i]]['messages_sent']:
 					chatty_people[i] = entity[j]
-	msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Seven Contributers:\t\n{} with {} messages. ({}%)\t\n{} with {} messages. ({}%)\t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%) \t\n{} with {} messages. ({}%)'.format(total_human_messages, chatty_people[0], entity_data[chatty_people[0]]['messages_sent'], entity_data[chatty_people[0]]['contribution_percent'], chatty_people[1], entity_data[chatty_people[1]]['messages_sent'], entity_data[chatty_people[1]]['contribution_percent'], chatty_people[2], entity_data[chatty_people[2]]['messages_sent'], entity_data[chatty_people[2]]['contribution_percent'], chatty_people[3], entity_data[chatty_people[3]]['messages_sent'], entity_data[chatty_people[3]]['contribution_percent'], chatty_people[4], entity_data[chatty_people[4]]['messages_sent'], entity_data[chatty_people[4]]['contribution_percent'], chatty_people[5], entity_data[chatty_people[5]]['messages_sent'], entity_data[chatty_people[5]]['contribution_percent'], chatty_people[6], entity_data[chatty_people[6]]['messages_sent'], entity_data[chatty_people[6]]['contribution_percent'])
+	msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Seven Contributers:\t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times.\t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times.'.format(total_human_messages, chatty_people[0], entity_data[chatty_people[0]]['messages_sent'], entity_data[chatty_people[0]]['contribution_percent'], entity_data[chatty_people[0]]['likes_collected'], chatty_people[1], entity_data[chatty_people[1]]['messages_sent'], entity_data[chatty_people[1]]['contribution_percent'], entity_data[chatty_people[1]]['likes_collected'], chatty_people[2], entity_data[chatty_people[2]]['messages_sent'], entity_data[chatty_people[2]]['contribution_percent'], entity_data[chatty_people[2]]['likes_collected'], chatty_people[3], entity_data[chatty_people[3]]['messages_sent'], entity_data[chatty_people[3]]['contribution_percent'], entity_data[chatty_people[3]]['likes_collected'], chatty_people[4], entity_data[chatty_people[4]]['messages_sent'], entity_data[chatty_people[4]]['contribution_percent'], entity_data[chatty_people[4]]['likes_collected'], chatty_people[5], entity_data[chatty_people[5]]['messages_sent'], entity_data[chatty_people[5]]['contribution_percent'], entity_data[chatty_people[5]]['likes_collected'], chatty_people[6], entity_data[chatty_people[6]]['messages_sent'], entity_data[chatty_people[6]]['contribution_percent'], entity_data[chatty_people[6]]['likes_collected'])
 	post_message('The Talker', msg, '')
 
 
@@ -287,7 +288,29 @@ def read_verse():
 	post_message('The Digital Journalist', verse, '')
 
 
-#----------------------------General-use Methods
+#----------------------------General-use Methods and Endpoints
+@app.route('/random', endpoint = 'random', methods=['POST'])
+def webhook():
+	log('General Log: Received a ping to the /random endpoint.')
+	x = randint(1, 8)
+	if x == 1:
+		read_quote()
+	if x == 2:
+		read_joke()
+	if x == 3:
+		analyze_chat()
+	if x == 4:
+		read_weather()
+	if x == 5:
+		read_holiday()
+	if x == 6:
+		read_news()
+	if x == 7:
+		read_history()
+	if x == 8:
+		read_verse()
+	return "ok", 200
+
 def post_message(bot_name, msg, image_url): 
 	if image_url == '': #Post message without photo.
 		if bot_name == 'The Talker': 

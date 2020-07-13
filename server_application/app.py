@@ -22,46 +22,52 @@ matcher = Matcher(nlp.vocab)
 
 #~~~~~~~~~~~~~~~Server Endpoints.
 @app.route('/', methods=['POST'])	#messages from GroupMe chats land here
-def webhook():				
+def webhook():
 	data = request.get_json()
 	if data['sender_type'] == 'user':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 		scan_message(data['text'])
+		if random_messages == True and randint(1, 100) == 59:
+			x = randint(1, 2)
+			if x == 1:
+				read_joke()
+			else:
+				read_quote()
 	return "ok", 200
-@app.route('/quote', endpoint = 'quote', methods=['POST'])
+@app.route('/analyze', endpoint = 'analyze', methods=['POST'])
 def webhook():
-	log('The Talker Log: Received a ping to the /quote endpoint.')
-	read_quote()
+	log('The Talker Log: Received a ping to the /analyze endpoint.')
+	read_chat()
 	return "ok", 200
 @app.route('/joke', endpoint = 'joke', methods=['POST'])
 def webhook():
 	log('The Talker Log: Received a ping to the /joke endpoint.')
 	read_joke()
 	return "ok", 200
-@app.route('/analyze', endpoint = 'analyze', methods=['POST'])
+@app.route('/quote', endpoint = 'quote', methods=['POST'])
 def webhook():
-	log('The Talker Log: Received a ping to the /analyze endpoint.')
-	analyze_chat()
+	log('The Talker Log: Received a ping to the /quote endpoint.')
+	read_quote()
 	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
 def scan_message(msg):
 	doc = nlp(msg) 															#transform the user's message into a spacy doc object
-	for token in doc: 														#iterate over each token (a word or punctuation)
+	for token in doc: 
+		if token.text.lower()[0:7] == 'analyze' and config.analyze_chat == True:
+			read_chat()														
 		if token.text.lower()[0:4] == 'joke' and config.read_joke == True:
 			read_joke()
+		if token.text.lower()[0:7] == 'history' and config.read_history == True:
+			read_history()
+		if token.text.lower()[0:7] == 'holiday' and config.read_holiday == True:
+			read_holiday()
 		if token.text.lower()[0:5] == 'quote' and config.read_quote == True:
 			read_quote()
-		if token.text.lower()[0:7] == 'analyze' and config.read_analyze == True:
-			analyze_chat()
 		if token.text.lower()[0:5] == 'verse' and config.read_verse == True:
 			read_verse()
 		if token.text.lower()[0:7] == 'weather' and config.read_weather == True:
 			read_weather()
-		if token.text.lower()[0:7] == 'holiday' and config.read_holiday == True:
-			read_holiday()
-		if token.text.lower()[0:7] == 'history' and config.read_history == True:
-			read_history()
 
 	#Spacy matching patterns for news catagories.
 	matcher.add("CUSTOM_NEWS_PATTERN1", None, [{"POS":"NOUN"}, {"LOWER":"news"}])   
@@ -87,19 +93,7 @@ def scan_message(msg):
 					log('The Talker Log: Received an unacceptable news request.')
 					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, or technology.", '')
 
-def read_quote():
-	x = randint(1, 80)
-	quote = linecache.getline('quotes.txt', x).rstrip('\n') 
-	log('The Talker Log: Quote has been read.')
-	post_message('The Talker', quote, '')
-
-def read_joke():
-	x = randint(1, 61)
-	joke = linecache.getline('jokes.txt', x).rstrip('\n') 
-	log('The Talker Log: Joke has been read.')
-	post_message('The Talker', joke, '')
-
-def analyze_chat():
+def read_chat():
 	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
 	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.getenv('GROUPME_DEVELOPER_TOKEN')))
 	group_messages = data.json()['response']['messages']
@@ -140,14 +134,26 @@ def analyze_chat():
 	msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Seven Contributers:\t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times.\t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times.'.format(total_human_messages, chatty_people[0], entity_data[chatty_people[0]]['messages_sent'], entity_data[chatty_people[0]]['contribution_percent'], entity_data[chatty_people[0]]['likes_collected'], chatty_people[1], entity_data[chatty_people[1]]['messages_sent'], entity_data[chatty_people[1]]['contribution_percent'], entity_data[chatty_people[1]]['likes_collected'], chatty_people[2], entity_data[chatty_people[2]]['messages_sent'], entity_data[chatty_people[2]]['contribution_percent'], entity_data[chatty_people[2]]['likes_collected'], chatty_people[3], entity_data[chatty_people[3]]['messages_sent'], entity_data[chatty_people[3]]['contribution_percent'], entity_data[chatty_people[3]]['likes_collected'], chatty_people[4], entity_data[chatty_people[4]]['messages_sent'], entity_data[chatty_people[4]]['contribution_percent'], entity_data[chatty_people[4]]['likes_collected'], chatty_people[5], entity_data[chatty_people[5]]['messages_sent'], entity_data[chatty_people[5]]['contribution_percent'], entity_data[chatty_people[5]]['likes_collected'], chatty_people[6], entity_data[chatty_people[6]]['messages_sent'], entity_data[chatty_people[6]]['contribution_percent'], entity_data[chatty_people[6]]['likes_collected'])
 	post_message('The Talker', msg, '')
 
+def read_joke():
+	x = randint(1, 61)
+	joke = linecache.getline('jokes.txt', x).rstrip('\n') 
+	log('The Talker Log: Joke has been read.')
+	post_message('The Talker', joke, '')
+
+def read_quote():
+	x = randint(1, 80)
+	quote = linecache.getline('quotes.txt', x).rstrip('\n') 
+	log('The Talker Log: Quote has been read.')
+	post_message('The Talker', quote, '')
+
 
 #----------------------------The Digital Journalist----------------------------#
 
 #~~~~~~~~~~~~~~~ Endpoints. 
-@app.route('/weather', endpoint = 'weather', methods=['POST'])
+@app.route('/history', endpoint = 'history', methods=['POST'])
 def webhook():
-	log('The Digital Journalist Log: Received a ping to the /weather endpoint.')
-	read_weather()
+	log('The Digital Journalist Log: Received a ping to the /history endpoint.')
+	read_history()
 	return "ok", 200
 @app.route('/holiday', endpoint = 'holiday', methods=['POST'])
 def webhook():
@@ -159,24 +165,48 @@ def webhook():
 	log('The Digital Journalist Log: Received a ping to the /news endpoint.')
 	read_news('')
 	return "ok", 200
-@app.route('/history', endpoint = 'history', methods=['POST'])
-def webhook():
-	log('The Digital Journalist Log: Received a ping to the /history endpoint.')
-	read_history()
-	return "ok", 200
 @app.route('/verse', endpoint = 'verse', methods=['POST'])
 def webhook():
 	log('The Digital Journalist Log: Received a ping to the /verse endpoint.')
 	read_verse()
 	return "ok", 200
+@app.route('/weather', endpoint = 'weather', methods=['POST'])
+def webhook():
+	log('The Digital Journalist Log: Received a ping to the /weather endpoint.')
+	read_weather()
+	return "ok", 200
 
 #~~~~~~~~~~~~~~~ Methods.
-def read_weather():
-	data = requests.get( 
-		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
-	)
-	log('The Digital Journalist Log: Received Weather. {}'.format(data))
-	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
+def read_history():
+	data = requests.get(
+		url = 'http://history.muffinlabs.com/date'
+		)
+	log("The Digital Journalist Log: Received Today's History. {}".format(data))
+
+	#Determine three random events to display.
+	limit = len(data.json()['data']['Events']) 
+	story1 = randint(0, limit - 1)
+	story2 = randint(0, limit - 1)
+	story3 = randint(0, limit - 1)
+
+	#Check once to see if there is a duplicate event in the list.
+	if(story2 == story1):	
+		story2 = randint(0, limit - 1)
+	if(story3 == story1 or story3 == story1):
+		story3 = randint(0, limit - 1)
+
+	#Scan the events twice to make sure the dates are in order.
+	for i in range(2): 
+		if(data.json()['data']['Events'][story1]['year'] > data.json()['data']['Events'][story2]['year']):
+			x = story1
+			story1 = story2
+			story2 = x
+		if(data.json()['data']['Events'][story2]['year'] > data.json()['data']['Events'][story3]['year']):
+			x = story3
+			story3 = story2
+			story2 = x
+	date = data.json()['date']
+	post_message('The Digital Journalist', 'Today in History, {}: \n\n{}, {}\n\n{}, {}\n\n{}, {}'.format(date, data.json()['data']['Events'][story1]['year'], data.json()['data']['Events'][story1]['text'], data.json()['data']['Events'][story2]['year'], data.json()['data']['Events'][story2]['text'], data.json()['data']['Events'][story3]['year'], data.json()['data']['Events'][story3]['text']), '')
 
 def read_holiday():
 	month = datetime.date.today().month
@@ -228,37 +258,6 @@ def read_news(category):
 
 	post_message('The Digital Journalist', "Top {} Headlines: \n\n{}\n{}, \n\n{}\n{}, \n\n{}\n{}".format(better_title, story1_title, story1_url, story2_title, story2_url, story3_title, story3_url),'')
 
-def read_history():
-	data = requests.get(
-		url = 'http://history.muffinlabs.com/date'
-		)
-	log("The Digital Journalist Log: Received Today's History. {}".format(data))
-
-	#Determine three random events to display.
-	limit = len(data.json()['data']['Events']) 
-	story1 = randint(0, limit - 1)
-	story2 = randint(0, limit - 1)
-	story3 = randint(0, limit - 1)
-
-	#Check once to see if there is a duplicate event in the list.
-	if(story2 == story1):	
-		story2 = randint(0, limit - 1)
-	if(story3 == story1 or story3 == story1):
-		story3 = randint(0, limit - 1)
-
-	#Scan the events twice to make sure the dates are in order.
-	for i in range(2): 
-		if(data.json()['data']['Events'][story1]['year'] > data.json()['data']['Events'][story2]['year']):
-			x = story1
-			story1 = story2
-			story2 = x
-		if(data.json()['data']['Events'][story2]['year'] > data.json()['data']['Events'][story3]['year']):
-			x = story3
-			story3 = story2
-			story2 = x
-	date = data.json()['date']
-	post_message('The Digital Journalist', 'Today in History, {}: \n\n{}, {}\n\n{}, {}\n\n{}, {}'.format(date, data.json()['data']['Events'][story1]['year'], data.json()['data']['Events'][story1]['text'], data.json()['data']['Events'][story2]['year'], data.json()['data']['Events'][story2]['text'], data.json()['data']['Events'][story3]['year'], data.json()['data']['Events'][story3]['text']), '')
-
 def read_verse():
 	dayNumber = (datetime.date.today() - datetime.date(2020, 1, 1)).days
 	data = requests.get( #Request verse and picture url from YouVersion. 
@@ -287,6 +286,13 @@ def read_verse():
 	post_message('The Digital Journalist', '', image_url)
 	post_message('The Digital Journalist', verse, '')
 
+def read_weather():
+	data = requests.get( 
+		url = 'https://api.weatherbit.io/v2.0/forecast/daily?city=Oakdale,MN&units=I&days=1&key={}'.format(os.getenv('WEATHERBIT_API_KEY'))
+	)
+	log('The Digital Journalist Log: Received Weather. {}'.format(data))
+	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
+
 
 #----------------------------General-use Methods and Endpoints
 @app.route('/random', endpoint = 'random', methods=['POST'])
@@ -294,25 +300,23 @@ def webhook():
 	log('General Log: Received a ping to the /random endpoint.')
 	x = randint(1, 8)
 	if x == 1:
-		read_quote()
+		read_chat()
 	if x == 2:
 		read_joke()
 	if x == 3:
-		analyze_chat()
-	if x == 4:
-		read_weather()
-	if x == 5:
-		read_holiday()
-	if x == 6:
-		read_news()
-	if x == 7:
 		read_history()
+	if x == 4:
+		read_holiday()
+	if x == 5:
+		read_news()
+	if x == 6:
+		read_quote()
+	if x == 7:
+		read_weather()
 	if x == 8:
 		read_verse()
-	return "ok", 200
-
 def post_message(bot_name, msg, image_url): 
-	if image_url == '': #Post message without photo.
+	if image_url == '': 
 		if bot_name == 'The Talker': 
 			data = requests.post(
 				url = 'https://api.groupme.com/v3/bots/post', 
@@ -370,7 +374,7 @@ def post_message(bot_name, msg, image_url):
 				}
 			)
 			log('The Digital Journalist Log: Message: "{}" was posted along with the image at this link: {}. {}'.format(msg, image_url, data))
-
+ 
 def log(msg): 
 	print(str(msg))
 	sys.stdout.flush()

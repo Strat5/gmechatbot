@@ -27,7 +27,7 @@ def webhook():
 	if data['sender_type'] == 'user':
 		log('The Talker Log: Received Message: "{}" from "{}".'.format(data['text'], data['name']))
 		scan_message(data['text'])
-		if random_messages == True and randint(1, 100) == 59:
+		if config.random_messages == True and randint(1, 100) == 59:
 			x = randint(1, 2)
 			if x == 1:
 				read_joke()

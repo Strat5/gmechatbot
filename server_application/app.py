@@ -53,7 +53,9 @@ def webhook():
 #~~~~~~~~~~~~~~~ Methods.
 def scan_message(msg):
 	doc = nlp(msg) 															#transform the user's message into a spacy doc object
-	for token in doc: 												
+	for token in doc: 					
+		if token.text.lower()[0:7] == 'analyze' and config.read_chat == True:
+			read_chat('')					
 		if token.text.lower()[0:4] == 'joke' and config.read_joke == True:
 			read_joke()
 		if token.text.lower()[0:7] == 'history' and config.read_history == True:
@@ -70,6 +72,7 @@ def scan_message(msg):
 	matcher.add("PERSON_ANALYZER_PATTERN1", None, [{"LOWER":"analyze"}, {"POS":"PROPN"}, {"POS":"PROPN"}])
 	matches = matcher(doc)
 	for match_id, start, end in matches:
+		log('TEMP LOG: matches: {}'.format(matches))
 		read_chat(matches[match_id][1:3])
 	matcher.remove("PERSON_ANALYZER_PATTERN1")
 

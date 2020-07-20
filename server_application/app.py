@@ -37,7 +37,7 @@ def webhook():
 @app.route('/analyze', endpoint = 'analyze', methods=['POST'])
 def webhook():
 	log('The Talker Log: Received a ping to the /analyze endpoint.')
-	read_chat('')
+	analyze_chat('')
 	return "ok", 200
 @app.route('/joke', endpoint = 'joke', methods=['POST'])
 def webhook():
@@ -54,8 +54,8 @@ def webhook():
 def scan_message(msg):
 	doc = nlp(msg) 															#transform the user's message into a spacy doc object
 	for token in doc: 					
-		if token.text.lower()[0:7] == 'analyze' and config.read_chat == True:
-			read_chat('')					
+		if token.text.lower()[0:7] == 'analyze' and config.analyze_chat == True:
+			analyze_chat('')					
 		if token.text.lower()[0:4] == 'joke' and config.read_joke == True:
 			read_joke()
 		if token.text.lower()[0:7] == 'history' and config.read_history == True:
@@ -73,7 +73,7 @@ def scan_message(msg):
 	matches = matcher(doc)
 	for match_id, start, end in matches:
 		log('TEMP LOG: matches: {}'.format(matches))
-		read_chat(matches[match_id][1:3])
+		analyze_chat(matches[match_id][1:3])
 	matcher.remove("PERSON_ANALYZER_PATTERN1")
 
 	#Spacy matching patterns for news catagories.
@@ -100,7 +100,7 @@ def scan_message(msg):
 					log('The Talker Log: Received an unacceptable news request.')
 					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, or technology.", '')
 
-def read_chat(selected_person):
+def analyze_chat(selected_person):
 	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
 	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.getenv('GROUPME_DEVELOPER_TOKEN')))
 	group_messages = data.json()['response']['messages']
@@ -315,7 +315,7 @@ def webhook():
 	log('General Log: Received a ping to the /random endpoint.')
 	x = randint(1, 8)
 	if x == 1:
-		read_chat('')
+		analyze_chat('')
 	if x == 2:
 		read_joke()
 	if x == 3:

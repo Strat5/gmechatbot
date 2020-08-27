@@ -37,7 +37,7 @@ def webhook():
 @app.route('/analyze', endpoint = 'analyze', methods=['POST'])
 def webhook():
 	log('The Talker Log: Received a ping to the /analyze endpoint.')
-	analyze_chat('')
+	analyze_chat()
 	return "ok", 200
 @app.route('/joke', endpoint = 'joke', methods=['POST'])
 def webhook():
@@ -55,7 +55,7 @@ def scan_message(msg):
 	doc = nlp(msg) 															#transform the user's message into a spacy doc object
 	for token in doc: 					
 		if token.text.lower()[0:7] == 'analyze' and config.analyze_chat == True:
-			analyze_chat('')					
+			analyze_chat()					
 		if token.text.lower()[0:4] == 'joke' and config.read_joke == True:
 			read_joke()
 		if token.text.lower()[0:7] == 'history' and config.read_history == True:
@@ -68,13 +68,6 @@ def scan_message(msg):
 			read_verse()
 		if token.text.lower()[0:7] == 'weather' and config.read_weather == True:
 			read_weather()
-	#Spacy matching patterns for people to analyze.
-	matcher.add("PERSON_ANALYZER_PATTERN1", None, [{"LOWER":"analyze"}, {"POS":"PROPN"}, {"POS":"PROPN"}])
-	matches = matcher(doc)
-	for match_id, start, end in matches:
-		log('TEMP LOG: matches: {}'.format(matches))
-		analyze_chat(matches[match_id][1:3])
-	matcher.remove("PERSON_ANALYZER_PATTERN1")
 
 	#Spacy matching patterns for news catagories.
 	matcher.add("CUSTOM_NEWS_PATTERN1", None, [{"POS":"NOUN"}, {"LOWER":"news"}])   
@@ -100,7 +93,7 @@ def scan_message(msg):
 					log('The Talker Log: Received an unacceptable news request.')
 					post_message("The Talker", "It appears that you requested news, but you did not provide an acceptable category. Try asking for news about: business, entertainment, general, health, science, sports, or technology.", '')
 
-def analyze_chat(selected_person):
+def analyze_chat():
 	post_message('The Talker', 'Analyzing all chat messages, this could take a while.', '')
 	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=100&token={}'.format(os.getenv('GROUPCHAT_ID'), os.getenv('GROUPME_DEVELOPER_TOKEN')))
 	group_messages = data.json()['response']['messages']
@@ -117,15 +110,16 @@ def analyze_chat(selected_person):
 	for i in range(len(group_messages)): 									#find every person who has ever sent a message in the groupchat
 		entity.add(group_messages[i]['name'])
 	entity = sorted(list(entity))
-	entity.append('FAKE ENTITY')
 	entity_data = {}
+	total_human_characters = 0
 	for i in range(len(entity)):											#assign each person as a index in a dictionary
 		entity_data[entity[i]] = {'messages_sent' : 0, 'characters_used' : 0, 'likes_collected' : 0, 'average_characters' : 0, 'contribution_percent' : 0}
-	for i in range(len(group_messages)): 									#iterate over each message to fill personal dictionaries
+	for i in range(len(group_messages)): 									#iterate over each message to fill both personal and global dictionaries
 		entity_data[group_messages[i]['name']]['messages_sent'] += 1
 		entity_data[group_messages[i]['name']]['likes_collected'] += len(group_messages[i]["favorited_by"])
 		if group_messages[i]['text'] is not None:
 			entity_data[group_messages[i]['name']]['characters_used'] += len(group_messages[i]['text'])
+			total_human_characters += len(group_messages[i]['text'])
 
 	total_human_messages = len(group_messages) - entity_data['GroupMe']['messages_sent']
 	for i in range(len(entity)):											#iterate over each person to do calculations
@@ -137,17 +131,14 @@ def analyze_chat(selected_person):
 	for i in range(7):
 		if i != 0:
 			for j in range(len(entity)):
-				if entity_data[entity[j]]['messages_sent'] > entity_data[chatty_people[i]]['messages_sent'] and entity_data[entity[j]]['messages_sent'] < entity_data[chatty_people[i-1]]['messages_sent']:
+				if entity_data[entity[j]]['characters_used'] > entity_data[chatty_people[i]]['characters_used'] and entity_data[entity[j]]['characters_used'] < entity_data[chatty_people[i-1]]['characters_used']:
 					chatty_people[i] = entity[j]
 		else:
 			for j in range(len(entity)):
-				if entity_data[entity[j]]['messages_sent'] > entity_data[chatty_people[i]]['messages_sent']:
+				if entity_data[entity[j]]['characters_used'] > entity_data[chatty_people[i]]['characters_used']:
 					chatty_people[i] = entity[j]
-	if selected_person == '':
-		msg = '{} messages have been sent (by humans) in the selected groupchat. \n\nThe Top Seven Contributers:\t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times.\t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times. \t\n{} with {} ({}%) messages liked {} times.'.format(total_human_messages, chatty_people[0], entity_data[chatty_people[0]]['messages_sent'], entity_data[chatty_people[0]]['contribution_percent'], entity_data[chatty_people[0]]['likes_collected'], chatty_people[1], entity_data[chatty_people[1]]['messages_sent'], entity_data[chatty_people[1]]['contribution_percent'], entity_data[chatty_people[1]]['likes_collected'], chatty_people[2], entity_data[chatty_people[2]]['messages_sent'], entity_data[chatty_people[2]]['contribution_percent'], entity_data[chatty_people[2]]['likes_collected'], chatty_people[3], entity_data[chatty_people[3]]['messages_sent'], entity_data[chatty_people[3]]['contribution_percent'], entity_data[chatty_people[3]]['likes_collected'], chatty_people[4], entity_data[chatty_people[4]]['messages_sent'], entity_data[chatty_people[4]]['contribution_percent'], entity_data[chatty_people[4]]['likes_collected'], chatty_people[5], entity_data[chatty_people[5]]['messages_sent'], entity_data[chatty_people[5]]['contribution_percent'], entity_data[chatty_people[5]]['likes_collected'], chatty_people[6], entity_data[chatty_people[6]]['messages_sent'], entity_data[chatty_people[6]]['contribution_percent'], entity_data[chatty_people[6]]['likes_collected'])
-	else:
-		msg = '{} has sent {} total messages, each with an average of {} characters. Their messages have been liked {} times.'.format(selected_person, entity_data[selected_person]['messages_sent'], entity_data[selected_person]['average_characters'], entity_data[selected_person]['likes_collected'])
-	post_message('The Talker', msg, '')
+		msg = '{} total characters have been used in {} sent messages in this groupchat.\t\tTop 7 Contributers:\n\t{} has sent {} characters in {} messages.\n\t{} has sent {} characters in {} messages.\n\t{} has sent {} characters in {} messages.\n\t{} has sent {} characters in {} messages.\n\t{} has sent {} characters in {} messages.\n\t{} has sent {} characters in {} messages.\n\t{} has sent {} characters in {} messages.'.format(chatty_people[0], entity_data[chatty_people[0]]['characters_used'], entity_data[chatty_people[0]]['messages_sent'], chatty_people[1], entity_data[chatty_people[1]]['characters_used'], entity_data[chatty_people[1]]['messages_sent'],chatty_people[2], entity_data[chatty_people[2]]['characters_used'], entity_data[chatty_people[2]]['messages_sent'],chatty_people[3], entity_data[chatty_people[3]]['characters_used'], entity_data[chatty_people[3]]['messages_sent'],chatty_people[4], entity_data[chatty_people[4]]['characters_used'], entity_data[chatty_people[4]]['messages_sent'],chatty_people[5], entity_data[chatty_people[5]]['characters_used'], entity_data[chatty_people[5]]['messages_sent'],chatty_people[6], entity_data[chatty_people[6]]['characters_used'], entity_data[chatty_people[6]]['messages_sent'])
+		post_message('The Talker', msg, '')
 
 def read_joke():
 	x = randint(1, 61)
@@ -309,27 +300,26 @@ def read_weather():
 	post_message('The Digital Journalist', "Today's high temp is {}°F, the low temp {}°F, and there is {}% predicted chance of precipitation. Clouds will cover the sky around {}% of sky today.".format(data.json()['data'][0]['high_temp'], data.json()['data'][0]['low_temp'], data.json()['data'][0]['pop'], data.json()['data'][0]['clouds']),'')	
 
 
-#----------------------------General-use Methods and Endpoints
-@app.route('/random', endpoint = 'random', methods=['POST'])
+#----------------------------General Use Methods and Endpoints
+@app.route('/servant', endpoint = 'servant', methods=['POST'])
 def webhook():
-	log('General Log: Received a ping to the /random endpoint.')
-	x = randint(1, 8)
-	if x == 1:
-		analyze_chat('')
-	if x == 2:
-		read_joke()
-	if x == 3:
-		read_history()
-	if x == 4:
-		read_holiday()
-	if x == 5:
-		read_news('')
-	if x == 6:
-		read_quote()
-	if x == 7:
-		read_weather()
-	if x == 8:
-		read_verse()
+	post_message('The Digital Journalist', 'Good morning, I am the Digital Journalist, if you would like any information regarding today\'s history, holidays, news, weather, or verse, just let me know.', '')
+	post_message('The Talker', 'And hello, I am the Talker... I really to tell jokes and recite quotes as well as read your messages.', '')
+	return "ok", 200
+
+@app.route('/activity_check', endpoint = 'activity_check', methods=['POST'])
+def webhook():
+	data = requests.get(url='https://api.groupme.com/v3/groups/{}/messages?limit=1&token={}'.format(os.getenv('GROUPCHAT_ID'), os.getenv('GROUPME_DEVELOPER_TOKEN')))
+	message = data.json()['response']['messages']
+	if message[0]['created_at'] + 100000 < int(time.time()):
+		post_message('The Talker', 'Things are slow, fix this.', '')
+		x = randint(1, 2)
+		if x == 1:
+			read_joke()
+		else:
+			read_quote()
+	return "ok", 200
+
 def post_message(bot_name, msg, image_url): 
 	if image_url == '': 
 		if bot_name == 'The Talker': 
